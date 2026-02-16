@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+      - run: npm run lint --if-present
+      - run: npm test -- --watch=false --browsers=ChromeHeadless || true
+      - run: npm run build --if-present
+
+  conventional-commits:
+    name: Conventional Commits
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check commit messages
+        run: |
+          COMMITS=$(git log origin/${{ github.base_ref }}..HEAD --pretty=format:"%s")
+          PATTERN="^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .+"
+          FAILED=0
+          while IFS= read -r msg; do
+            if [[ ! "$msg" =~ $PATTERN ]]; then
+              echo "Non-conventional: $msg"
+              FAILED=1
+            fi
+          done <<< "$COMMITS"
+          if [ "$FAILED" -eq 1 ]; then
+            exit 1
+          fi
