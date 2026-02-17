@@ -1,7 +1,141 @@
-<mat-card>
-  <mat-card-header>
-    <mat-icon mat-card-avatar>people</mat-icon>
-    <mat-card-title>{{ 'module.cidadaos' | translate }}</mat-card-title>
-    <mat-card-subtitle>{{ 'common.underConstruction' | translate }}</mat-card-subtitle>
-  </mat-card-header>
-</mat-card>
+<div class="cidadao-page">
+  <div class="page-header">
+    <h2>{{ 'cidadao.title' | translate }}</h2>
+    @if (canCreate) {
+      <button mat-raised-button color="primary" (click)="openCreate()">
+        <mat-icon>person_add</mat-icon>
+        {{ 'cidadao.newCitizen' | translate }}
+      </button>
+    }
+  </div>
+
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-row">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>{{ 'common.search' | translate }}</mat-label>
+          <input matInput [value]="search" (input)="onSearchInput($any($event.target).value)">
+          <mat-icon matPrefix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>{{ 'common.status' | translate }}</mat-label>
+          <mat-select [(ngModel)]="estadoFilter" (selectionChange)="onFilterChange()">
+            <mat-option value="">{{ 'cidadao.allStatuses' | translate }}</mat-option>
+            <mat-option value="ACTIVO">{{ 'cidadao.estado.ACTIVO' | translate }}</mat-option>
+            <mat-option value="INACTIVO">{{ 'cidadao.estado.INACTIVO' | translate }}</mat-option>
+            <mat-option value="SUSPENSO">{{ 'cidadao.estado.SUSPENSO' | translate }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>{{ 'cidadao.sexo' | translate }}</mat-label>
+          <mat-select [(ngModel)]="sexoFilter" (selectionChange)="onFilterChange()">
+            <mat-option value="">{{ 'cidadao.allSexos' | translate }}</mat-option>
+            <mat-option value="MASCULINO">{{ 'cidadao.sexo.MASCULINO' | translate }}</mat-option>
+            <mat-option value="FEMININO">{{ 'cidadao.sexo.FEMININO' | translate }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  @if (loading()) {
+    <sgc-loading-spinner />
+  } @else {
+    <mat-card class="table-card">
+      <table mat-table [dataSource]="cidadaos()" matSort (matSortChange)="onSort($event)">
+        <ng-container matColumnDef="nomeCompleto">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'cidadao.nomeCompleto' | translate }}</th>
+          <td mat-cell *matCellDef="let row" class="name-cell" (click)="openDetail(row)">{{ row.nomeCompleto }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="numeroPassaporte">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'cidadao.numeroPassaporte' | translate }}</th>
+          <td mat-cell *matCellDef="let row">{{ row.numeroPassaporte }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="nacionalidade">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'cidadao.nacionalidade' | translate }}</th>
+          <td mat-cell *matCellDef="let row">{{ row.nacionalidade ?? '—' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="sexo">
+          <th mat-header-cell *matHeaderCellDef>{{ 'cidadao.sexo' | translate }}</th>
+          <td mat-cell *matCellDef="let row">{{ row.sexo ? ('cidadao.sexo.' + row.sexo | translate) : '—' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>{{ 'common.status' | translate }}</th>
+          <td mat-cell *matCellDef="let row"><sgc-status-badge [status]="row.estado" /></td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>{{ 'common.actions' | translate }}</th>
+          <td mat-cell *matCellDef="let row">
+            <button mat-icon-button [matMenuTriggerFor]="rowMenu" (click)="$event.stopPropagation()">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #rowMenu="matMenu">
+              <button mat-menu-item (click)="openDetail(row)">
+                <mat-icon>visibility</mat-icon>
+                <span>{{ 'common.details' | translate }}</span>
+              </button>
+              @if (canEdit) {
+                <button mat-menu-item (click)="openEdit(row)">
+                  <mat-icon>edit</mat-icon>
+                  <span>{{ 'common.edit' | translate }}</span>
+                </button>
+              }
+              @if (canChangeStatus) {
+                @if (row.estado !== 'ACTIVO') {
+                  <button mat-menu-item (click)="changeEstado(row, 'ACTIVO')">
+                    <mat-icon>check_circle</mat-icon>
+                    <span>{{ 'cidadao.estado.ACTIVO' | translate }}</span>
+                  </button>
+                }
+                @if (row.estado !== 'INACTIVO') {
+                  <button mat-menu-item (click)="changeEstado(row, 'INACTIVO')">
+                    <mat-icon>block</mat-icon>
+                    <span>{{ 'cidadao.estado.INACTIVO' | translate }}</span>
+                  </button>
+                }
+                @if (row.estado !== 'SUSPENSO') {
+                  <button mat-menu-item (click)="changeEstado(row, 'SUSPENSO')">
+                    <mat-icon>pause_circle</mat-icon>
+                    <span>{{ 'cidadao.estado.SUSPENSO' | translate }}</span>
+                  </button>
+                }
+              }
+              @if (canDelete) {
+                <button mat-menu-item (click)="deleteCidadao(row)" class="delete-action">
+                  <mat-icon>delete</mat-icon>
+                  <span>{{ 'common.delete' | translate }}</span>
+                </button>
+              }
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="clickable-row" (click)="openDetail(row)"></tr>
+      </table>
+
+      @if (cidadaos().length === 0) {
+        <div class="no-data">
+          <mat-icon>people_outline</mat-icon>
+          <span>{{ 'common.noData' | translate }}</span>
+        </div>
+      }
+
+      <mat-paginator
+        [length]="totalElements()"
+        [pageIndex]="page"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[10, 20, 50]"
+        (page)="onPageChange($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+    </mat-card>
+  }
+</div>

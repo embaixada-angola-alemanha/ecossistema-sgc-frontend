@@ -12,6 +12,9 @@ import { MatChipsModule } from '@angular/material/chips';
     .status-aprovado, .status-concluido { background-color: #4caf50; color: white; }
     .status-rejeitado, .status-cancelado { background-color: #f44336; color: white; }
     .status-em_processamento { background-color: #ff9800; color: white; }
+    .status-activo { background-color: #4caf50; color: white; }
+    .status-inactivo { background-color: #9e9e9e; color: white; }
+    .status-suspenso { background-color: #ff9800; color: white; }
   `,
 })
 export class StatusBadge {
