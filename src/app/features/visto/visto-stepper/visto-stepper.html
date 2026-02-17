@@ -1,0 +1,327 @@
+<div class="stepper-page">
+  <div class="page-header">
+    <button mat-icon-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h2>{{ (isEdit ? 'visto.editVisa' : 'visto.newVisa') | translate }}</h2>
+  </div>
+
+  @if (loading()) {
+    <sgc-loading-spinner />
+  } @else {
+    <mat-stepper linear #stepper>
+      <!-- Step 1: Cidadao Selection -->
+      <mat-step [stepControl]="cidadaoForm" [label]="'visto.step.cidadao' | translate">
+        <form [formGroup]="cidadaoForm">
+          <div class="step-content">
+            <h3>{{ 'visto.selectCidadao' | translate }}</h3>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ 'visto.cidadaoNome' | translate }}</mat-label>
+              <mat-select formControlName="cidadaoId" (selectionChange)="onCidadaoSelect($event.value)">
+                @for (c of cidadaos(); track c.id) {
+                  <mat-option [value]="c.id">{{ c.nomeCompleto }} — {{ c.numeroPassaporte }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            @if (selectedCidadao()) {
+              <mat-card class="summary-card">
+                <mat-card-header>
+                  <mat-icon mat-card-avatar>person</mat-icon>
+                  <mat-card-title>{{ selectedCidadao()!.nomeCompleto }}</mat-card-title>
+                  <mat-card-subtitle>{{ selectedCidadao()!.numeroPassaporte }}</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                  <div class="summary-grid">
+                    <div class="summary-item">
+                      <span class="label">{{ 'cidadao.nacionalidade' | translate }}</span>
+                      <span>{{ selectedCidadao()!.nacionalidade ?? '—' }}</span>
+                    </div>
+                    <div class="summary-item">
+                      <span class="label">{{ 'cidadao.email' | translate }}</span>
+                      <span>{{ selectedCidadao()!.email ?? '—' }}</span>
+                    </div>
+                    <div class="summary-item">
+                      <span class="label">{{ 'cidadao.telefone' | translate }}</span>
+                      <span>{{ selectedCidadao()!.telefone ?? '—' }}</span>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            }
+          </div>
+          <div class="step-actions">
+            <button mat-raised-button color="primary" matStepperNext [disabled]="cidadaoForm.invalid">
+              {{ 'visto.next' | translate }}
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- Step 2: Tipo de Visto -->
+      <mat-step [stepControl]="tipoForm" [label]="'visto.step.tipo' | translate">
+        <form [formGroup]="tipoForm">
+          <div class="step-content">
+            <h3>{{ 'visto.selectTipo' | translate }}</h3>
+            <mat-radio-group formControlName="tipo" class="tipo-grid" (change)="onTipoChange($event.value)">
+              @for (tipo of tipoValues; track tipo) {
+                <mat-card class="tipo-card" [class.selected]="tipoForm.value.tipo === tipo" (click)="tipoForm.patchValue({tipo}); onTipoChange(tipo)">
+                  <mat-radio-button [value]="tipo">
+                    {{ 'visto.tipo.' + tipo | translate }}
+                  </mat-radio-button>
+                </mat-card>
+              }
+            </mat-radio-group>
+
+            @if (fee()) {
+              <mat-card class="info-card">
+                <mat-card-content>
+                  <div class="fee-info">
+                    <mat-icon>payments</mat-icon>
+                    <div>
+                      <span class="label">{{ 'visto.valorTaxa' | translate }}</span>
+                      @if (fee()!.isento) {
+                        <span class="fee-value exempt">{{ 'visto.exempt' | translate }}</span>
+                      } @else {
+                        <span class="fee-value">{{ fee()!.valor | currency:fee()!.moeda }}</span>
+                      }
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            }
+
+            @if (checklist()) {
+              <mat-card class="info-card">
+                <mat-card-content>
+                  <div class="checklist-header">
+                    <mat-icon>checklist</mat-icon>
+                    <span class="label">{{ 'visto.requiredDocuments' | translate }}</span>
+                  </div>
+                  <mat-list>
+                    @for (doc of checklist()!.documentosRequeridos; track doc) {
+                      <mat-list-item>
+                        <mat-icon matListItemIcon>description</mat-icon>
+                        <span matListItemTitle>{{ doc }}</span>
+                      </mat-list-item>
+                    }
+                  </mat-list>
+                </mat-card-content>
+              </mat-card>
+            }
+          </div>
+          <div class="step-actions">
+            <button mat-button matStepperPrevious>
+              <mat-icon>arrow_back</mat-icon>
+              {{ 'common.back' | translate }}
+            </button>
+            <button mat-raised-button color="primary" matStepperNext [disabled]="tipoForm.invalid">
+              {{ 'visto.next' | translate }}
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- Step 3: Travel Details -->
+      <mat-step [label]="'visto.step.travel' | translate">
+        <form [formGroup]="travelForm">
+          <div class="step-content">
+            <h3>{{ 'visto.travelDetails' | translate }}</h3>
+            <div class="form-grid">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>{{ 'visto.motivoViagem' | translate }}</mat-label>
+                <textarea matInput formControlName="motivoViagem" rows="3"></textarea>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'visto.dataEntrada' | translate }}</mat-label>
+                <input matInput [matDatepicker]="entradaPicker" formControlName="dataEntrada">
+                <mat-datepicker-toggle matSuffix [for]="entradaPicker" />
+                <mat-datepicker #entradaPicker />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'visto.dataSaida' | translate }}</mat-label>
+                <input matInput [matDatepicker]="saidaPicker" formControlName="dataSaida">
+                <mat-datepicker-toggle matSuffix [for]="saidaPicker" />
+                <mat-datepicker #saidaPicker />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'visto.localAlojamento' | translate }}</mat-label>
+                <input matInput formControlName="localAlojamento">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'visto.entidadeConvite' | translate }}</mat-label>
+                <input matInput formControlName="entidadeConvite">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'visto.nacionalidadePassaporte' | translate }}</mat-label>
+                <input matInput formControlName="nacionalidadePassaporte">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>{{ 'visto.observacoes' | translate }}</mat-label>
+                <textarea matInput formControlName="observacoes" rows="2"></textarea>
+              </mat-form-field>
+            </div>
+          </div>
+          <div class="step-actions">
+            <button mat-button matStepperPrevious>
+              <mat-icon>arrow_back</mat-icon>
+              {{ 'common.back' | translate }}
+            </button>
+            <button mat-raised-button color="primary" matStepperNext>
+              {{ 'visto.next' | translate }}
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- Step 4: Documents & Payment -->
+      <mat-step [label]="'visto.step.documents' | translate">
+        <form [formGroup]="documentsForm">
+          <div class="step-content">
+            <h3>{{ 'visto.documentsPayment' | translate }}</h3>
+
+            @if (checklist()) {
+              <mat-card class="info-card">
+                <mat-card-content>
+                  <div class="checklist-header">
+                    <mat-icon>checklist</mat-icon>
+                    <span class="label">{{ 'visto.requiredDocuments' | translate }}</span>
+                  </div>
+                  @for (doc of checklist()!.documentosRequeridos; track doc) {
+                    <mat-checkbox class="doc-checkbox">{{ doc }}</mat-checkbox>
+                  }
+                </mat-card-content>
+              </mat-card>
+            }
+
+            @if (fee()) {
+              <mat-card class="info-card">
+                <mat-card-content>
+                  <div class="fee-info">
+                    <mat-icon>payments</mat-icon>
+                    <div>
+                      <span class="label">{{ 'visto.valorTaxa' | translate }}</span>
+                      @if (fee()!.isento) {
+                        <span class="fee-value exempt">{{ 'visto.exempt' | translate }}</span>
+                      } @else {
+                        <span class="fee-value">{{ fee()!.valor | currency:fee()!.moeda }}</span>
+                      }
+                    </div>
+                  </div>
+                  @if (!fee()!.isento) {
+                    <mat-checkbox formControlName="taxaPaga">{{ 'visto.taxaPaga' | translate }}</mat-checkbox>
+                  }
+                </mat-card-content>
+              </mat-card>
+            }
+          </div>
+          <div class="step-actions">
+            <button mat-button matStepperPrevious>
+              <mat-icon>arrow_back</mat-icon>
+              {{ 'common.back' | translate }}
+            </button>
+            <button mat-raised-button color="primary" matStepperNext>
+              {{ 'visto.next' | translate }}
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- Step 5: Confirmation -->
+      <mat-step [label]="'visto.step.confirmation' | translate">
+        <div class="step-content">
+          <h3>{{ 'visto.confirmation' | translate }}</h3>
+          <mat-card class="summary-card">
+            <mat-card-content>
+              <div class="confirm-grid">
+                <div class="confirm-section">
+                  <h4>{{ 'visto.step.cidadao' | translate }}</h4>
+                  <div class="confirm-row">
+                    <span class="label">{{ 'visto.cidadaoNome' | translate }}</span>
+                    <span>{{ getCidadaoName(cidadaoForm.value.cidadaoId) }}</span>
+                  </div>
+                </div>
+
+                <div class="confirm-section">
+                  <h4>{{ 'visto.step.tipo' | translate }}</h4>
+                  <div class="confirm-row">
+                    <span class="label">{{ 'common.type' | translate }}</span>
+                    <span>{{ 'visto.tipo.' + tipoForm.value.tipo | translate }}</span>
+                  </div>
+                  @if (fee()) {
+                    <div class="confirm-row">
+                      <span class="label">{{ 'visto.valorTaxa' | translate }}</span>
+                      <span>{{ fee()!.isento ? ('visto.exempt' | translate) : (fee()!.valor | currency:fee()!.moeda) }}</span>
+                    </div>
+                  }
+                </div>
+
+                <div class="confirm-section">
+                  <h4>{{ 'visto.step.travel' | translate }}</h4>
+                  @if (travelForm.value.motivoViagem) {
+                    <div class="confirm-row">
+                      <span class="label">{{ 'visto.motivoViagem' | translate }}</span>
+                      <span>{{ travelForm.value.motivoViagem }}</span>
+                    </div>
+                  }
+                  @if (travelForm.value.dataEntrada) {
+                    <div class="confirm-row">
+                      <span class="label">{{ 'visto.dataEntrada' | translate }}</span>
+                      <span>{{ travelForm.value.dataEntrada | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                  }
+                  @if (travelForm.value.dataSaida) {
+                    <div class="confirm-row">
+                      <span class="label">{{ 'visto.dataSaida' | translate }}</span>
+                      <span>{{ travelForm.value.dataSaida | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                  }
+                  @if (travelForm.value.localAlojamento) {
+                    <div class="confirm-row">
+                      <span class="label">{{ 'visto.localAlojamento' | translate }}</span>
+                      <span>{{ travelForm.value.localAlojamento }}</span>
+                    </div>
+                  }
+                  @if (travelForm.value.entidadeConvite) {
+                    <div class="confirm-row">
+                      <span class="label">{{ 'visto.entidadeConvite' | translate }}</span>
+                      <span>{{ travelForm.value.entidadeConvite }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+        <div class="step-actions">
+          <button mat-button matStepperPrevious>
+            <mat-icon>arrow_back</mat-icon>
+            {{ 'common.back' | translate }}
+          </button>
+          <button mat-stroked-button (click)="saveDraft()" [disabled]="saving()">
+            <mat-icon>save</mat-icon>
+            {{ 'visto.saveDraft' | translate }}
+          </button>
+          <button mat-raised-button color="primary" (click)="submitVisa(true)" [disabled]="saving()">
+            @if (saving()) {
+              <mat-spinner diameter="20"></mat-spinner>
+            } @else {
+              <mat-icon>send</mat-icon>
+            }
+            {{ 'visto.submit' | translate }}
+          </button>
+        </div>
+      </mat-step>
+    </mat-stepper>
+  }
+</div>

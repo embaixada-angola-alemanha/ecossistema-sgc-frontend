@@ -11,7 +11,8 @@ import { MatChipsModule } from '@angular/material/chips';
     .status-em_analise, .status-submetido { background-color: #2196f3; color: white; }
     .status-aprovado, .status-concluido { background-color: #4caf50; color: white; }
     .status-rejeitado, .status-cancelado { background-color: #f44336; color: white; }
-    .status-em_processamento { background-color: #ff9800; color: white; }
+    .status-documentos_pendentes, .status-em_processamento { background-color: #ff9800; color: white; }
+    .status-emitido { background-color: #2e7d32; color: white; }
     .status-activo { background-color: #4caf50; color: white; }
     .status-inactivo { background-color: #9e9e9e; color: white; }
     .status-suspenso { background-color: #ff9800; color: white; }

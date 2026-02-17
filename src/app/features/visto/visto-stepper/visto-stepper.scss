@@ -1,0 +1,160 @@
+.stepper-page {
+  max-width: 900px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 0;
+    font-weight: 600;
+  }
+}
+
+.step-content {
+  padding: 16px 0;
+
+  h3 {
+    margin: 0 0 16px;
+    font-weight: 500;
+  }
+}
+
+.step-actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 16px;
+  justify-content: flex-end;
+}
+
+.full-width {
+  width: 100%;
+}
+
+// Step 1 - Cidadao
+.summary-card {
+  margin-top: 16px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+// Step 2 - Tipo
+.tipo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.tipo-card {
+  padding: 16px;
+  cursor: pointer;
+  border: 1px solid var(--border, rgba(201, 168, 76, 0.08));
+  transition: border-color 0.2s, background-color 0.2s;
+
+  &:hover {
+    border-color: var(--gold, #c9a84c);
+  }
+
+  &.selected {
+    border-color: var(--gold, #c9a84c);
+    background: var(--gold-dim, rgba(201, 168, 76, 0.06));
+  }
+}
+
+.info-card {
+  margin-top: 16px;
+}
+
+.fee-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .fee-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--gold, #c9a84c);
+  }
+
+  .exempt {
+    color: #4caf50;
+  }
+}
+
+.checklist-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+// Step 3 - Travel
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+}
+
+// Step 4 - Documents
+.doc-checkbox {
+  display: block;
+  margin: 8px 0;
+}
+
+// Step 5 - Confirmation
+.confirm-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.confirm-section {
+  h4 {
+    margin: 0 0 8px;
+    font-weight: 600;
+    color: var(--gold, #c9a84c);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+  }
+}
+
+.confirm-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border, rgba(201, 168, 76, 0.08));
+}
+
+.label {
+  font-size: 0.85rem;
+  color: var(--text-dim, rgba(224, 232, 240, 0.4));
+}
+
+@media (max-width: 768px) {
+  .tipo-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
