@@ -1,50 +1,72 @@
-<mat-toolbar color="primary" class="app-toolbar">
-  <button mat-icon-button (click)="sidenav.toggle()">
-    <mat-icon>menu</mat-icon>
-  </button>
-  <span class="app-title">{{ 'app.title' | translate }}</span>
-  <span class="spacer"></span>
-
-  <button mat-icon-button [matMenuTriggerFor]="langMenu" aria-label="Language">
-    <mat-icon>language</mat-icon>
-  </button>
-  <mat-menu #langMenu="matMenu">
-    <button mat-menu-item (click)="switchLang('pt')">Portugues</button>
-    <button mat-menu-item (click)="switchLang('de')">Deutsch</button>
-    <button mat-menu-item (click)="switchLang('en')">English</button>
-    <button mat-menu-item (click)="switchLang('cs')">Kriol</button>
-  </mat-menu>
-
-  <button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="User">
-    <mat-icon>account_circle</mat-icon>
-  </button>
-  <mat-menu #userMenu="matMenu">
-    <div class="user-info">
-      <mat-icon>person</mat-icon>
-      <span>{{ username() }}</span>
-    </div>
-    <button mat-menu-item (click)="logout()">
-      <mat-icon>logout</mat-icon>
-      <span>{{ 'auth.logout' | translate }}</span>
-    </button>
-  </mat-menu>
-</mat-toolbar>
-
 <mat-sidenav-container class="app-container">
   <mat-sidenav #sidenav mode="side" opened class="app-sidenav">
-    <mat-nav-list>
-      @for (item of navItems; track item.route) {
-        @if (isVisible(item)) {
-          <a mat-list-item [routerLink]="item.route" routerLinkActive="active-link">
-            <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-            <span>{{ item.labelKey | translate }}</span>
-          </a>
-        }
+    <!-- Embassy Branding -->
+    <div class="side-brand">
+      <div class="emblem">EA</div>
+      <h2 class="brand-title">Embaixada de Angola</h2>
+      <div class="brand-sub">Gestão Consular</div>
+    </div>
+
+    <!-- Navigation Sections -->
+    @for (section of navSections; track section.label) {
+      @if (hasSectionItems(section)) {
+        <div class="nav-section" [class.push-bottom]="section.pushToBottom">
+          <div class="nav-label">{{ section.label }}</div>
+          @for (item of section.items; track item.route) {
+            @if (isVisible(item)) {
+              <a class="nav-item" [routerLink]="item.route" routerLinkActive="active">
+                <div class="nav-icon">
+                  <mat-icon>{{ item.icon }}</mat-icon>
+                </div>
+                <span>{{ item.labelKey | translate }}</span>
+              </a>
+            }
+          }
+        </div>
       }
-    </mat-nav-list>
+    }
   </mat-sidenav>
 
-  <mat-sidenav-content class="app-content">
-    <router-outlet />
+  <mat-sidenav-content class="app-main">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="top-left">
+        <button mat-icon-button class="menu-toggle" (click)="sidenav.toggle()">
+          <mat-icon>menu</mat-icon>
+        </button>
+      </div>
+      <div class="top-right">
+        <!-- Language Switcher -->
+        <button mat-icon-button [matMenuTriggerFor]="langMenu" class="top-btn" aria-label="Language">
+          <mat-icon>language</mat-icon>
+        </button>
+        <mat-menu #langMenu="matMenu">
+          <button mat-menu-item (click)="switchLang('pt')">Português</button>
+          <button mat-menu-item (click)="switchLang('de')">Deutsch</button>
+          <button mat-menu-item (click)="switchLang('en')">English</button>
+          <button mat-menu-item (click)="switchLang('cs')">Kriol</button>
+        </mat-menu>
+
+        <!-- User Menu -->
+        <button [matMenuTriggerFor]="userMenu" class="avatar" aria-label="User">
+          {{ userInitials() }}
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <div class="user-info">
+            <mat-icon>person</mat-icon>
+            <span>{{ username() }}</span>
+          </div>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>{{ 'auth.logout' | translate }}</span>
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+
+    <!-- Page Content -->
+    <div class="page-content">
+      <router-outlet />
+    </div>
   </mat-sidenav-content>
 </mat-sidenav-container>
