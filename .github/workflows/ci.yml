@@ -33,7 +33,7 @@ jobs:
           node-version: '20'
           cache: npm
       - run: npm ci
-      - run: npm test -- --watch=false --browsers=ChromeHeadless
+      - run: npm test
 
   docker:
     name: Build Docker Image
