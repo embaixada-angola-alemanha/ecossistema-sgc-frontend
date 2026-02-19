@@ -1,0 +1,75 @@
+.agendamento-form-page {
+  max-width: 800px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 0;
+    font-weight: 600;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.slots-section {
+  h4 {
+    margin: 0 0 12px;
+    color: var(--gold-light, #e8d08e);
+    font-family: 'Playfair Display', serif;
+  }
+}
+
+.slots-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.slot-button {
+  min-width: 100px;
+  border-color: var(--border, rgba(201, 168, 76, 0.1)) !important;
+
+  &.selected {
+    background: var(--gold, #c9a84c) !important;
+    color: #0c0f14 !important;
+    border-color: var(--gold, #c9a84c) !important;
+  }
+
+  .slot-duration {
+    font-size: 10px;
+    opacity: 0.7;
+    margin-left: 4px;
+  }
+}
+
+.no-slots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px;
+  color: var(--text-dim, rgba(224, 232, 240, 0.65));
+
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+mat-card-actions {
+  padding: 16px !important;
+}

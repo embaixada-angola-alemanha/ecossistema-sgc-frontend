@@ -1,0 +1,24 @@
+{
+  "list": {
+    "success": true,
+    "data": {
+      "content": [
+        {
+          "id": "d1",
+          "cidadaoId": "c1",
+          "tipo": "PASSAPORTE",
+          "estado": "VERIFICADO",
+          "numero": "DOC-001",
+          "dataEmissao": "2025-01-10",
+          "dataValidade": "2035-01-10",
+          "versao": 1
+        }
+      ],
+      "page": 0,
+      "size": 20,
+      "totalElements": 1,
+      "totalPages": 1,
+      "last": true
+    }
+  }
+}

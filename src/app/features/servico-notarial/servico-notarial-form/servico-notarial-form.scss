@@ -1,0 +1,164 @@
+.form-page {
+  max-width: 900px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 0;
+    font-weight: 600;
+  }
+}
+
+.step-content {
+  padding: 16px 0;
+
+  h3 {
+    margin: 0 0 16px;
+    font-weight: 500;
+  }
+}
+
+.step-actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 16px;
+  justify-content: flex-end;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+}
+
+.info-card {
+  margin-top: 16px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+}
+
+.info-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim, rgba(224, 232, 240, 0.65));
+}
+
+.mono {
+  font-family: 'DM Sans', monospace;
+  letter-spacing: 0.05em;
+}
+
+.fee-card {
+  margin: 16px 0;
+}
+
+.fee-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fee-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fee-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim, rgba(224, 232, 240, 0.65));
+}
+
+.fee-value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--gold, #c9a84c);
+}
+
+.fee-value.exempt {
+  color: #4caf50;
+}
+
+.section-title {
+  font-weight: 500;
+  color: var(--gold, #c9a84c);
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  margin: 0 0 16px;
+}
+
+.no-type-selected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px;
+  color: var(--text-dim, rgba(224, 232, 240, 0.65));
+}
+
+.review-card {
+  margin-bottom: 16px;
+}
+
+.review-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.review-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  &.full {
+    grid-column: 1 / -1;
+  }
+}
+
+.review-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim, rgba(224, 232, 240, 0.65));
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .form-row,
+  .info-grid,
+  .review-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -117,7 +117,7 @@ interface DialogData {
       font-size: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--text-dim, rgba(224, 232, 240, 0.4));
+      color: var(--text-dim, rgba(224, 232, 240, 0.65));
     }
     .value {
       font-size: 0.95rem;

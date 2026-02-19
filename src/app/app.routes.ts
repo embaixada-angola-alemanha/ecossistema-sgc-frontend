@@ -25,6 +25,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'documentos',
+    loadChildren: () => import('./features/documento/documento.routes').then((m) => m.DOCUMENTO_ROUTES),
+    canActivate: [authGuard],
+  },
+  {
     path: 'registos-civis',
     loadChildren: () => import('./features/registo-civil/registo-civil.routes').then((m) => m.REGISTO_CIVIL_ROUTES),
     canActivate: [authGuard],
@@ -33,6 +38,18 @@ export const routes: Routes = [
     path: 'servicos-notariais',
     loadChildren: () => import('./features/servico-notarial/servico-notarial.routes').then((m) => m.SERVICO_NOTARIAL_ROUTES),
     canActivate: [authGuard],
+  },
+  {
+    path: 'workflow-admin',
+    loadChildren: () => import('./features/workflow-admin/workflow-admin.routes').then((m) => m.WORKFLOW_ADMIN_ROUTES),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN', 'CONSUL'] },
+  },
+  {
+    path: 'user-admin',
+    loadChildren: () => import('./features/user-admin/user-admin.routes').then((m) => m.USER_ADMIN_ROUTES),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN', 'CONSUL'] },
   },
   {
     path: 'relatorios',

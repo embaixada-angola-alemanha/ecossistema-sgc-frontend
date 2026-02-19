@@ -1,7 +1,199 @@
-<mat-card>
-  <mat-card-header>
-    <mat-icon mat-card-avatar>assessment</mat-icon>
-    <mat-card-title>{{ 'module.relatorios' | translate }}</mat-card-title>
-    <mat-card-subtitle>{{ 'common.underConstruction' | translate }}</mat-card-subtitle>
-  </mat-card-header>
-</mat-card>
+<div class="relatorio-page">
+  <div class="page-header">
+    <h2>{{ 'module.relatorios' | translate }}</h2>
+    <div class="header-actions">
+      <button mat-stroked-button [matMenuTriggerFor]="exportMenu">
+        <mat-icon>download</mat-icon>
+        {{ 'relatorio.export' | translate }}
+      </button>
+      <mat-menu #exportMenu="matMenu">
+        <button mat-menu-item (click)="exportPdfDashboard()">
+          <mat-icon>picture_as_pdf</mat-icon>
+          <span>{{ 'relatorio.exportDashboardPdf' | translate }}</span>
+        </button>
+        @for (mod of modules; track mod.key) {
+          <button mat-menu-item (click)="exportCsv(mod.key)">
+            <mat-icon>table_chart</mat-icon>
+            <span>CSV &mdash; {{ mod.label | translate }}</span>
+          </button>
+        }
+      </mat-menu>
+    </div>
+  </div>
+
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-row">
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>{{ 'relatorio.dataInicio' | translate }}</mat-label>
+          <input matInput type="date" [(ngModel)]="dataInicio">
+          <mat-icon matPrefix>calendar_today</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>{{ 'relatorio.dataFim' | translate }}</mat-label>
+          <input matInput type="date" [(ngModel)]="dataFim">
+          <mat-icon matPrefix>event</mat-icon>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="applyFilter()">
+          <mat-icon>filter_list</mat-icon>
+          {{ 'relatorio.filter' | translate }}
+        </button>
+        <button mat-button (click)="clearFilter()">
+          <mat-icon>clear</mat-icon>
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  @if (loading()) {
+    <sgc-loading-spinner />
+  } @else if (dashboard()) {
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <mat-card class="kpi-card total-card">
+        <mat-icon>analytics</mat-icon>
+        <div class="kpi-value">{{ dashboard()!.totalGeral }}</div>
+        <div class="kpi-label">{{ 'relatorio.totalGeral' | translate }}</div>
+      </mat-card>
+
+      @for (mod of modules; track mod.key) {
+        @if (getModuleData(mod.key); as data) {
+          <mat-card class="kpi-card">
+            <mat-icon>{{ mod.icon }}</mat-icon>
+            <div class="kpi-value">{{ data.total }}</div>
+            <div class="kpi-label">{{ mod.label | translate }}</div>
+          </mat-card>
+        }
+      }
+    </div>
+
+    <!-- Module Detail Cards -->
+    <mat-tab-group>
+      @for (mod of modules; track mod.key) {
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>{{ mod.icon }}</mat-icon>
+            <span style="margin-left: 8px">{{ mod.label | translate }}</span>
+          </ng-template>
+
+          @if (getModuleData(mod.key); as data) {
+            <div class="module-detail">
+              <div class="charts-row">
+                <!-- By Estado -->
+                <mat-card class="chart-card">
+                  <mat-card-header>
+                    <mat-card-title>{{ 'relatorio.byEstado' | translate }}</mat-card-title>
+                  </mat-card-header>
+                  <mat-card-content>
+                    <div class="bar-chart">
+                      @for (entry of getTopEntries(data.porEstado); track entry.key) {
+                        <div class="bar-row">
+                          <span class="bar-label">{{ entry.key }}</span>
+                          <div class="bar-track">
+                            <div class="bar-fill" [style.width]="barWidth(entry.value, getMaxValue(data.porEstado))"></div>
+                          </div>
+                          <span class="bar-value">{{ entry.value }}</span>
+                        </div>
+                      }
+                      @if (Object.keys(data.porEstado).length === 0) {
+                        <div class="no-chart-data">{{ 'common.noData' | translate }}</div>
+                      }
+                    </div>
+                  </mat-card-content>
+                  <mat-card-actions>
+                    <button mat-button (click)="exportCsv(mod.key)">
+                      <mat-icon>download</mat-icon> CSV
+                    </button>
+                    <button mat-button (click)="exportPdfModulo(mod.key)">
+                      <mat-icon>picture_as_pdf</mat-icon> PDF
+                    </button>
+                  </mat-card-actions>
+                </mat-card>
+
+                <!-- By Tipo -->
+                <mat-card class="chart-card">
+                  <mat-card-header>
+                    <mat-card-title>{{ 'relatorio.byTipo' | translate }}</mat-card-title>
+                  </mat-card-header>
+                  <mat-card-content>
+                    <div class="bar-chart">
+                      @for (entry of getTopEntries(data.porTipo); track entry.key) {
+                        <div class="bar-row">
+                          <span class="bar-label">{{ entry.key }}</span>
+                          <div class="bar-track">
+                            <div class="bar-fill tipo" [style.width]="barWidth(entry.value, getMaxValue(data.porTipo))"></div>
+                          </div>
+                          <span class="bar-value">{{ entry.value }}</span>
+                        </div>
+                      }
+                      @if (Object.keys(data.porTipo).length === 0) {
+                        <div class="no-chart-data">{{ 'common.noData' | translate }}</div>
+                      }
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+            </div>
+          }
+        </mat-tab>
+      }
+    </mat-tab-group>
+
+    <!-- Audit Log (Admin only) -->
+    @if (isAdmin) {
+      <h3 class="section-title">
+        <mat-icon>security</mat-icon>
+        {{ 'relatorio.auditLog' | translate }}
+      </h3>
+      <mat-card class="table-card">
+        <table mat-table [dataSource]="auditEvents()">
+          <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef>{{ 'relatorio.audit.action' | translate }}</th>
+            <td mat-cell *matCellDef="let row" class="mono">{{ row.action }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="entityType">
+            <th mat-header-cell *matHeaderCellDef>{{ 'relatorio.audit.entity' | translate }}</th>
+            <td mat-cell *matCellDef="let row">{{ row.entityType }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="username">
+            <th mat-header-cell *matHeaderCellDef>{{ 'relatorio.audit.user' | translate }}</th>
+            <td mat-cell *matCellDef="let row">{{ row.username }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="details">
+            <th mat-header-cell *matHeaderCellDef>{{ 'relatorio.audit.details' | translate }}</th>
+            <td mat-cell *matCellDef="let row" class="details-cell">{{ row.details }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="timestamp">
+            <th mat-header-cell *matHeaderCellDef>{{ 'common.date' | translate }}</th>
+            <td mat-cell *matCellDef="let row">{{ row.timestamp | date:'dd/MM/yyyy HH:mm' }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="auditColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: auditColumns;"></tr>
+        </table>
+
+        @if (auditEvents().length === 0) {
+          <div class="no-data">
+            <mat-icon>shield</mat-icon>
+            <span>{{ 'common.noData' | translate }}</span>
+          </div>
+        }
+
+        <mat-paginator
+          [length]="auditTotal()"
+          [pageIndex]="auditPage"
+          [pageSize]="auditPageSize"
+          [pageSizeOptions]="[10, 20, 50]"
+          (page)="onAuditPageChange($event)"
+          showFirstLastButtons>
+        </mat-paginator>
+      </mat-card>
+    }
+  }
+</div>

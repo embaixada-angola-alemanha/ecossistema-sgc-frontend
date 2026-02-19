@@ -1,8 +1,11 @@
+<!-- Skip Link for keyboard navigation -->
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
 <mat-sidenav-container class="app-container">
-  <mat-sidenav #sidenav mode="side" opened class="app-sidenav">
+  <mat-sidenav #sidenav mode="side" opened class="app-sidenav" role="navigation" aria-label="Main navigation">
     <!-- Embassy Branding -->
     <div class="side-brand">
-      <div class="emblem">EA</div>
+      <div class="emblem" role="img" aria-label="Embassy of Angola emblem">EA</div>
       <h2 class="brand-title">Embaixada de Angola</h2>
       <div class="brand-sub">Gestão Consular</div>
     </div>
@@ -10,12 +13,13 @@
     <!-- Navigation Sections -->
     @for (section of navSections; track section.label) {
       @if (hasSectionItems(section)) {
-        <div class="nav-section" [class.push-bottom]="section.pushToBottom">
-          <div class="nav-label">{{ section.label }}</div>
+        <div class="nav-section" [class.push-bottom]="section.pushToBottom" role="group" [attr.aria-label]="section.label">
+          <div class="nav-label" aria-hidden="true">{{ section.label }}</div>
           @for (item of section.items; track item.route) {
             @if (isVisible(item)) {
-              <a class="nav-item" [routerLink]="item.route" routerLinkActive="active">
-                <div class="nav-icon">
+              <a class="nav-item" [routerLink]="item.route" routerLinkActive="active"
+                 [attr.aria-label]="item.labelKey | translate" [attr.aria-current]="null">
+                <div class="nav-icon" aria-hidden="true">
                   <mat-icon>{{ item.icon }}</mat-icon>
                 </div>
                 <span>{{ item.labelKey | translate }}</span>
@@ -29,44 +33,60 @@
 
   <mat-sidenav-content class="app-main">
     <!-- Top Bar -->
-    <div class="top-bar">
+    <header class="top-bar" role="banner">
       <div class="top-left">
-        <button mat-icon-button class="menu-toggle" (click)="sidenav.toggle()">
+        <button mat-icon-button class="menu-toggle" (click)="sidenav.toggle()"
+                aria-label="Toggle navigation menu">
           <mat-icon>menu</mat-icon>
         </button>
       </div>
       <div class="top-right">
         <!-- Language Switcher -->
-        <button mat-icon-button [matMenuTriggerFor]="langMenu" class="top-btn" aria-label="Language">
-          <mat-icon>language</mat-icon>
+        <button mat-button [matMenuTriggerFor]="langMenu" class="lang-btn"
+                [attr.aria-label]="'Language: ' + currentLang().toUpperCase()">
+          <mat-icon aria-hidden="true">language</mat-icon>
+          <span class="lang-code">{{ currentLang().toUpperCase() }}</span>
         </button>
         <mat-menu #langMenu="matMenu">
-          <button mat-menu-item (click)="switchLang('pt')">Português</button>
-          <button mat-menu-item (click)="switchLang('de')">Deutsch</button>
-          <button mat-menu-item (click)="switchLang('en')">English</button>
-          <button mat-menu-item (click)="switchLang('cs')">Kriol</button>
+          <button mat-menu-item (click)="switchLang('pt')" [class.active-lang]="currentLang() === 'pt'"
+                  [attr.aria-pressed]="currentLang() === 'pt'">
+            <span class="lang-flag" aria-hidden="true">🇦🇴</span> Português
+          </button>
+          <button mat-menu-item (click)="switchLang('de')" [class.active-lang]="currentLang() === 'de'"
+                  [attr.aria-pressed]="currentLang() === 'de'">
+            <span class="lang-flag" aria-hidden="true">🇩🇪</span> Deutsch
+          </button>
+          <button mat-menu-item (click)="switchLang('en')" [class.active-lang]="currentLang() === 'en'"
+                  [attr.aria-pressed]="currentLang() === 'en'">
+            <span class="lang-flag" aria-hidden="true">🇬🇧</span> English
+          </button>
+          <button mat-menu-item (click)="switchLang('cs')" [class.active-lang]="currentLang() === 'cs'"
+                  [attr.aria-pressed]="currentLang() === 'cs'">
+            <span class="lang-flag" aria-hidden="true">🇨🇻</span> Kriol
+          </button>
         </mat-menu>
 
         <!-- User Menu -->
-        <button [matMenuTriggerFor]="userMenu" class="avatar" aria-label="User">
+        <button [matMenuTriggerFor]="userMenu" class="avatar"
+                [attr.aria-label]="'User menu: ' + username()">
           {{ userInitials() }}
         </button>
         <mat-menu #userMenu="matMenu">
-          <div class="user-info">
-            <mat-icon>person</mat-icon>
+          <div class="user-info" role="status">
+            <mat-icon aria-hidden="true">person</mat-icon>
             <span>{{ username() }}</span>
           </div>
           <button mat-menu-item (click)="logout()">
-            <mat-icon>logout</mat-icon>
+            <mat-icon aria-hidden="true">logout</mat-icon>
             <span>{{ 'auth.logout' | translate }}</span>
           </button>
         </mat-menu>
       </div>
-    </div>
+    </header>
 
     <!-- Page Content -->
-    <div class="page-content">
+    <main id="main-content" class="page-content" role="main">
       <router-outlet />
-    </div>
+    </main>
   </mat-sidenav-content>
 </mat-sidenav-container>

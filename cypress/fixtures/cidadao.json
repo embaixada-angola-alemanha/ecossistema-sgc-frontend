@@ -1,0 +1,55 @@
+{
+  "list": {
+    "success": true,
+    "data": {
+      "content": [
+        {
+          "id": "c1",
+          "nomeCompleto": "João Silva",
+          "numeroPassaporte": "N1234567",
+          "dataNascimento": "1990-05-15",
+          "sexo": "MASCULINO",
+          "nacionalidade": "Angolana",
+          "estadoCivil": "SOLTEIRO",
+          "email": "joao@test.com",
+          "telefone": "+244912345678",
+          "estado": "ACTIVO"
+        },
+        {
+          "id": "c2",
+          "nomeCompleto": "Maria Santos",
+          "numeroPassaporte": "N7654321",
+          "dataNascimento": "1985-12-01",
+          "sexo": "FEMININO",
+          "nacionalidade": "Angolana",
+          "estadoCivil": "CASADO",
+          "email": "maria@test.com",
+          "telefone": "+244987654321",
+          "estado": "ACTIVO"
+        }
+      ],
+      "page": 0,
+      "size": 20,
+      "totalElements": 2,
+      "totalPages": 1,
+      "last": true
+    }
+  },
+  "single": {
+    "success": true,
+    "data": {
+      "id": "c1",
+      "nomeCompleto": "João Silva",
+      "numeroPassaporte": "N1234567",
+      "dataNascimento": "1990-05-15",
+      "sexo": "MASCULINO",
+      "nacionalidade": "Angolana",
+      "estadoCivil": "SOLTEIRO",
+      "email": "joao@test.com",
+      "telefone": "+244912345678",
+      "enderecoAngola": "Luanda, Angola",
+      "enderecoAlemanha": "Berlin, Germany",
+      "estado": "ACTIVO"
+    }
+  }
+}

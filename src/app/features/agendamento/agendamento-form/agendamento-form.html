@@ -1,0 +1,89 @@
+<div class="agendamento-form-page">
+  <div class="page-header">
+    <button mat-icon-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h2>{{ (isEdit() ? 'agendamento.reschedule' : 'agendamento.new') | translate }}</h2>
+  </div>
+
+  @if (loading()) {
+    <sgc-loading-spinner />
+  } @else {
+    <mat-card>
+      <mat-card-content>
+        <div class="form-grid">
+          @if (!isEdit()) {
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ 'agendamento.cidadaoNome' | translate }}</mat-label>
+              <mat-select [(ngModel)]="cidadaoId" required>
+                @for (c of cidadaos(); track c.id) {
+                  <mat-option [value]="c.id">{{ c.nomeCompleto }} ({{ c.numeroPassaporte }})</mat-option>
+                }
+              </mat-select>
+              <mat-icon matPrefix>person</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'common.type' | translate }}</mat-label>
+              <mat-select [(ngModel)]="tipo" (selectionChange)="onTipoChange()" required>
+                @for (t of tipoValues; track t) {
+                  <mat-option [value]="t">{{ 'agendamento.tipo.' + t | translate }}</mat-option>
+                }
+              </mat-select>
+              <mat-icon matPrefix>category</mat-icon>
+            </mat-form-field>
+          }
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'agendamento.selectDate' | translate }}</mat-label>
+            <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate"
+                   (dateChange)="onDateChange()" [matDatepickerFilter]="weekdayFilter"
+                   [min]="isEdit() ? null : today" readonly>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+
+          @if (selectedDate && tipo) {
+            <div class="slots-section full-width">
+              <h4>{{ 'agendamento.availableSlots' | translate }}</h4>
+              @if (loadingSlots()) {
+                <sgc-loading-spinner />
+              } @else if (slots().length === 0) {
+                <div class="no-slots">
+                  <mat-icon>event_busy</mat-icon>
+                  <span>{{ 'agendamento.noSlots' | translate }}</span>
+                </div>
+              } @else {
+                <div class="slots-grid">
+                  @for (slot of slots(); track slot.dataHora) {
+                    <button mat-stroked-button
+                            class="slot-button"
+                            [class.selected]="selectedSlot?.dataHora === slot.dataHora"
+                            (click)="selectSlot(slot)">
+                      {{ slot.dataHora | date:'HH:mm' }}
+                      <span class="slot-duration">{{ slot.duracaoMinutos }}min</span>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ 'agendamento.notas' | translate }}</mat-label>
+            <textarea matInput [(ngModel)]="notas" rows="3"></textarea>
+            <mat-icon matPrefix>notes</mat-icon>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button mat-button (click)="goBack()">{{ 'common.cancel' | translate }}</button>
+        <button mat-raised-button color="primary" [disabled]="!canSubmit" (click)="submit()">
+          <mat-icon>{{ isEdit() ? 'edit_calendar' : 'event_available' }}</mat-icon>
+          {{ (isEdit() ? 'agendamento.reschedule' : 'common.save') | translate }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  }
+</div>

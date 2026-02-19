@@ -174,7 +174,7 @@ interface DialogData {
     .visa-number {
       font-family: 'DM Sans', monospace;
       font-size: 0.85rem;
-      color: var(--text-dim, rgba(224, 232, 240, 0.4));
+      color: var(--text-dim, rgba(224, 232, 240, 0.65));
       margin-left: 8px;
       letter-spacing: 0.05em;
     }
@@ -195,7 +195,7 @@ interface DialogData {
       font-size: 0.75rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--text-dim, rgba(224, 232, 240, 0.4));
+      color: var(--text-dim, rgba(224, 232, 240, 0.65));
     }
     .value { font-size: 0.95rem; }
 
@@ -220,7 +220,7 @@ interface DialogData {
       display: flex;
       justify-content: space-between;
       font-size: 0.8rem;
-      color: var(--text-dim, rgba(224, 232, 240, 0.4));
+      color: var(--text-dim, rgba(224, 232, 240, 0.65));
       margin-bottom: 4px;
     }
     .history-transition {

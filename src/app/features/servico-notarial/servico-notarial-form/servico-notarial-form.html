@@ -1,0 +1,300 @@
+@if (loading()) {
+  <sgc-loading-spinner />
+} @else {
+  <div class="form-page">
+    <div class="page-header">
+      <button mat-icon-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h2>{{ (isEdit ? 'servicoNotarial.editServico' : 'servicoNotarial.newServico') | translate }}</h2>
+    </div>
+
+    <mat-stepper linear #stepper>
+      <!-- Step 1: Select Citizen -->
+      <mat-step [stepControl]="cidadaoForm">
+        <ng-template matStepLabel>{{ 'servicoNotarial.step.cidadao' | translate }}</ng-template>
+        <form [formGroup]="cidadaoForm" class="step-content">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ 'servicoNotarial.cidadaoNome' | translate }}</mat-label>
+            <mat-select formControlName="cidadaoId" (selectionChange)="onCidadaoSelect($event.value)">
+              @for (c of cidadaos(); track c.id) {
+                <mat-option [value]="c.id">{{ c.nomeCompleto }} ({{ c.numeroPassaporte }})</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          @if (selectedCidadao()) {
+            <mat-card class="info-card">
+              <mat-card-content>
+                <div class="info-grid">
+                  <div><span class="info-label">{{ 'cidadao.nomeCompleto' | translate }}</span><span>{{ selectedCidadao()!.nomeCompleto }}</span></div>
+                  <div><span class="info-label">{{ 'cidadao.numeroPassaporte' | translate }}</span><span class="mono">{{ selectedCidadao()!.numeroPassaporte }}</span></div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          }
+
+          <div class="step-actions">
+            <button mat-raised-button color="primary" matStepperNext [disabled]="cidadaoForm.invalid">
+              {{ 'common.next' | translate }}
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- Step 2: Type & Description -->
+      <mat-step [stepControl]="tipoForm">
+        <ng-template matStepLabel>{{ 'servicoNotarial.step.tipo' | translate }}</ng-template>
+        <form [formGroup]="tipoForm" class="step-content">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ 'servicoNotarial.tipoServico' | translate }}</mat-label>
+            <mat-select formControlName="tipo" (selectionChange)="onTipoChange($event.value)">
+              @for (tipo of tipoValues; track tipo) {
+                <mat-option [value]="tipo">{{ 'servicoNotarial.tipo.' + tipo | translate }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          @if (fee()) {
+            <mat-card class="fee-card">
+              <mat-card-content>
+                <div class="fee-display">
+                  <mat-icon>euro</mat-icon>
+                  <div class="fee-info">
+                    <span class="fee-label">{{ 'servicoNotarial.taxa' | translate }}</span>
+                    @if (fee()!.isento) {
+                      <span class="fee-value exempt">{{ 'servicoNotarial.isento' | translate }}</span>
+                    } @else {
+                      <span class="fee-value">{{ fee()!.valor | currency:fee()!.moeda }}</span>
+                    }
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          }
+
+          <div [formGroup]="descForm">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ 'servicoNotarial.descricao' | translate }}</mat-label>
+              <textarea matInput formControlName="descricao" rows="3"></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ 'servicoNotarial.observacoes' | translate }}</mat-label>
+              <textarea matInput formControlName="observacoes" rows="2"></textarea>
+            </mat-form-field>
+          </div>
+
+          <div class="step-actions">
+            <button mat-stroked-button matStepperPrevious>
+              <mat-icon>arrow_back</mat-icon>
+              {{ 'common.previous' | translate }}
+            </button>
+            <button mat-raised-button color="primary" matStepperNext [disabled]="tipoForm.invalid">
+              {{ 'common.next' | translate }}
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- Step 3: Type-Specific Fields -->
+      <mat-step>
+        <ng-template matStepLabel>{{ 'servicoNotarial.step.details' | translate }}</ng-template>
+        <form [formGroup]="specificForm" class="step-content">
+
+          @if (selectedTipo === 'PROCURACAO') {
+            <h3 class="section-title">{{ 'servicoNotarial.procuracaoDetails' | translate }}</h3>
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'servicoNotarial.outorgante' | translate }}</mat-label>
+                <input matInput formControlName="outorgante">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'servicoNotarial.outorgado' | translate }}</mat-label>
+                <input matInput formControlName="outorgado">
+              </mat-form-field>
+            </div>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ 'servicoNotarial.finalidadeProcuracao' | translate }}</mat-label>
+              <textarea matInput formControlName="finalidadeProcuracao" rows="3"></textarea>
+            </mat-form-field>
+          }
+
+          @if (selectedTipo === 'LEGALIZACAO') {
+            <h3 class="section-title">{{ 'servicoNotarial.legalizacaoDetails' | translate }}</h3>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ 'servicoNotarial.documentoOrigem' | translate }}</mat-label>
+              <input matInput formControlName="documentoOrigem">
+            </mat-form-field>
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'servicoNotarial.paisOrigem' | translate }}</mat-label>
+                <input matInput formControlName="paisOrigem">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'servicoNotarial.entidadeEmissora' | translate }}</mat-label>
+                <input matInput formControlName="entidadeEmissora">
+              </mat-form-field>
+            </div>
+          }
+
+          @if (selectedTipo === 'APOSTILA') {
+            <h3 class="section-title">{{ 'servicoNotarial.apostilaDetails' | translate }}</h3>
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'servicoNotarial.documentoApostilado' | translate }}</mat-label>
+                <input matInput formControlName="documentoApostilado">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'servicoNotarial.paisDestino' | translate }}</mat-label>
+                <input matInput formControlName="paisDestino">
+              </mat-form-field>
+            </div>
+          }
+
+          @if (selectedTipo === 'COPIA_CERTIFICADA') {
+            <h3 class="section-title">{{ 'servicoNotarial.copiaCertificadaDetails' | translate }}</h3>
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'servicoNotarial.documentoOriginalRef' | translate }}</mat-label>
+                <input matInput formControlName="documentoOriginalRef">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'servicoNotarial.numeroCopias' | translate }}</mat-label>
+                <input matInput type="number" formControlName="numeroCopias" min="1">
+              </mat-form-field>
+            </div>
+          }
+
+          @if (!selectedTipo) {
+            <div class="no-type-selected">
+              <mat-icon>info</mat-icon>
+              <span>{{ 'servicoNotarial.selectTypeFirst' | translate }}</span>
+            </div>
+          }
+
+          <div class="step-actions">
+            <button mat-stroked-button matStepperPrevious>
+              <mat-icon>arrow_back</mat-icon>
+              {{ 'common.previous' | translate }}
+            </button>
+            <button mat-raised-button color="primary" matStepperNext>
+              {{ 'common.next' | translate }}
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- Step 4: Review & Submit -->
+      <mat-step>
+        <ng-template matStepLabel>{{ 'servicoNotarial.step.review' | translate }}</ng-template>
+        <div class="step-content">
+          <mat-card class="review-card">
+            <mat-card-content>
+              <div class="review-grid">
+                <div class="review-item">
+                  <span class="review-label">{{ 'servicoNotarial.cidadaoNome' | translate }}</span>
+                  <span>{{ getCidadaoName(cidadaoForm.value.cidadaoId) }}</span>
+                </div>
+                <div class="review-item">
+                  <span class="review-label">{{ 'common.type' | translate }}</span>
+                  <span>{{ 'servicoNotarial.tipo.' + tipoForm.value.tipo | translate }}</span>
+                </div>
+                @if (fee()) {
+                  <div class="review-item">
+                    <span class="review-label">{{ 'servicoNotarial.taxa' | translate }}</span>
+                    <span class="fee-value">{{ fee()!.isento ? ('servicoNotarial.isento' | translate) : (fee()!.valor | currency:fee()!.moeda) }}</span>
+                  </div>
+                }
+                @if (descForm.value.descricao) {
+                  <div class="review-item full">
+                    <span class="review-label">{{ 'servicoNotarial.descricao' | translate }}</span>
+                    <span>{{ descForm.value.descricao }}</span>
+                  </div>
+                }
+
+                @if (selectedTipo === 'PROCURACAO') {
+                  @if (specificForm.value.outorgante) {
+                    <div class="review-item">
+                      <span class="review-label">{{ 'servicoNotarial.outorgante' | translate }}</span>
+                      <span>{{ specificForm.value.outorgante }}</span>
+                    </div>
+                  }
+                  @if (specificForm.value.outorgado) {
+                    <div class="review-item">
+                      <span class="review-label">{{ 'servicoNotarial.outorgado' | translate }}</span>
+                      <span>{{ specificForm.value.outorgado }}</span>
+                    </div>
+                  }
+                }
+
+                @if (selectedTipo === 'LEGALIZACAO') {
+                  @if (specificForm.value.documentoOrigem) {
+                    <div class="review-item">
+                      <span class="review-label">{{ 'servicoNotarial.documentoOrigem' | translate }}</span>
+                      <span>{{ specificForm.value.documentoOrigem }}</span>
+                    </div>
+                  }
+                  @if (specificForm.value.paisOrigem) {
+                    <div class="review-item">
+                      <span class="review-label">{{ 'servicoNotarial.paisOrigem' | translate }}</span>
+                      <span>{{ specificForm.value.paisOrigem }}</span>
+                    </div>
+                  }
+                }
+
+                @if (selectedTipo === 'APOSTILA') {
+                  @if (specificForm.value.documentoApostilado) {
+                    <div class="review-item">
+                      <span class="review-label">{{ 'servicoNotarial.documentoApostilado' | translate }}</span>
+                      <span>{{ specificForm.value.documentoApostilado }}</span>
+                    </div>
+                  }
+                  @if (specificForm.value.paisDestino) {
+                    <div class="review-item">
+                      <span class="review-label">{{ 'servicoNotarial.paisDestino' | translate }}</span>
+                      <span>{{ specificForm.value.paisDestino }}</span>
+                    </div>
+                  }
+                }
+
+                @if (selectedTipo === 'COPIA_CERTIFICADA') {
+                  @if (specificForm.value.documentoOriginalRef) {
+                    <div class="review-item">
+                      <span class="review-label">{{ 'servicoNotarial.documentoOriginalRef' | translate }}</span>
+                      <span>{{ specificForm.value.documentoOriginalRef }}</span>
+                    </div>
+                  }
+                  <div class="review-item">
+                    <span class="review-label">{{ 'servicoNotarial.numeroCopias' | translate }}</span>
+                    <span>{{ specificForm.value.numeroCopias }}</span>
+                  </div>
+                }
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <div class="step-actions">
+            <button mat-stroked-button matStepperPrevious>
+              <mat-icon>arrow_back</mat-icon>
+              {{ 'common.previous' | translate }}
+            </button>
+            <button mat-stroked-button (click)="saveDraft()" [disabled]="saving()">
+              <mat-icon>save</mat-icon>
+              {{ 'common.saveDraft' | translate }}
+            </button>
+            <button mat-raised-button color="primary" (click)="submitServico(true)" [disabled]="saving()">
+              @if (saving()) {
+                <mat-icon class="spin">sync</mat-icon>
+              }
+              {{ 'servicoNotarial.submit' | translate }}
+            </button>
+          </div>
+        </div>
+      </mat-step>
+    </mat-stepper>
+  </div>
+}

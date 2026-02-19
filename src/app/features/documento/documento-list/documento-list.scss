@@ -1,0 +1,107 @@
+.documento-page {
+  max-width: 1200px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 0;
+    font-weight: 600;
+  }
+}
+
+.filters-card {
+  margin-bottom: 16px;
+}
+
+.cidadao-select {
+  width: 100%;
+}
+
+.table-card {
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+}
+
+.tipo-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.file-cell {
+  display: flex;
+  flex-direction: column;
+
+  .file-name {
+    font-size: 13px;
+  }
+
+  .file-size {
+    font-size: 11px;
+    color: var(--text-dim, rgba(232, 228, 220, 0.45));
+  }
+}
+
+.no-file {
+  color: var(--text-dim);
+  font-style: italic;
+  font-size: 12px;
+}
+
+.mono {
+  font-family: 'DM Sans', monospace;
+  letter-spacing: 0.05em;
+}
+
+.expired {
+  color: var(--red, #cc092f);
+}
+
+.clickable-row {
+  cursor: pointer;
+
+  &:hover {
+    background: var(--gold-dim, rgba(201, 168, 76, 0.06)) !important;
+  }
+}
+
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 48px;
+  color: var(--text-dim, rgba(224, 232, 240, 0.65));
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+  }
+}
+
+.delete-action {
+  color: #f44336 !important;
+
+  mat-icon {
+    color: #f44336 !important;
+  }
+}
+
+mat-paginator {
+  border-top: 1px solid var(--border, rgba(201, 168, 76, 0.08));
+}

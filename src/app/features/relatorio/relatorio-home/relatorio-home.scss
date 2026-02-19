@@ -1,0 +1,207 @@
+.relatorio-page {
+  max-width: 1200px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+.filters-card {
+  margin-bottom: 16px;
+}
+
+.filters-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-field {
+  flex: 1;
+  min-width: 160px;
+}
+
+// KPI Grid
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  padding: 20px;
+  text-align: center;
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    margin-bottom: 8px;
+  }
+
+  .kpi-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--gold, #c9a84c);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .kpi-label {
+    font-size: 12px;
+    color: var(--text-dim, rgba(232, 228, 220, 0.45));
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &.total-card {
+    .kpi-value {
+      font-size: 40px;
+      color: var(--gold-light, #e8d08e);
+    }
+  }
+}
+
+// Module Detail
+.module-detail {
+  padding: 16px 0;
+}
+
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.chart-card {
+  min-height: 200px;
+}
+
+// Bar chart
+.bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bar-label {
+  width: 120px;
+  font-size: 12px;
+  text-align: right;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bar-track {
+  flex: 1;
+  height: 20px;
+  background: var(--surface2, #1a1f2b);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  border-radius: 4px;
+  transition: width 0.4s ease;
+
+  &.tipo {
+    background: linear-gradient(90deg, #2196f3, #64b5f6);
+  }
+}
+
+.bar-value {
+  width: 40px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+.no-chart-data {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+// Section title
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 32px 0 16px;
+  font-family: 'Playfair Display', serif;
+  color: var(--gold-light, #e8d08e);
+}
+
+// Table
+.table-card {
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+}
+
+.mono {
+  font-family: 'DM Sans', monospace;
+  letter-spacing: 0.05em;
+  font-size: 12px;
+}
+
+.details-cell {
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 48px;
+  color: var(--text-dim, rgba(224, 232, 240, 0.65));
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+  }
+}
+
+mat-paginator {
+  border-top: 1px solid var(--border, rgba(201, 168, 76, 0.08));
+}
+
+// Material tab overrides
+::ng-deep .mat-mdc-tab-header {
+  margin-bottom: 16px;
+}

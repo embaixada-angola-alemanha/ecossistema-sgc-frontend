@@ -38,8 +38,11 @@ export class App implements OnInit {
   private readonly translate = inject(TranslateService);
   private readonly keycloak = inject(KeycloakService);
 
+  private static readonly LANG_KEY = 'sgc-lang';
+
   readonly username = signal('');
   readonly userRoles = signal<string[]>([]);
+  readonly currentLang = signal('pt');
 
   readonly userInitials = computed(() => {
     const name = this.username();
@@ -66,12 +69,15 @@ export class App implements OnInit {
       items: [
         { icon: 'article', labelKey: 'nav.registosCivis', route: '/registos-civis', roles: ['ADMIN', 'CONSUL', 'OFFICER', 'VIEWER'] },
         { icon: 'gavel', labelKey: 'nav.servicosNotariais', route: '/servicos-notariais', roles: ['ADMIN', 'CONSUL', 'OFFICER', 'VIEWER'] },
+        { icon: 'folder', labelKey: 'nav.documentos', route: '/documentos', roles: ['ADMIN', 'CONSUL', 'OFFICER', 'VIEWER'] },
       ],
     },
     {
       label: 'Sistema',
       pushToBottom: true,
       items: [
+        { icon: 'account_tree', labelKey: 'nav.workflowAdmin', route: '/workflow-admin', roles: ['ADMIN', 'CONSUL'] },
+        { icon: 'manage_accounts', labelKey: 'nav.userAdmin', route: '/user-admin', roles: ['ADMIN', 'CONSUL'] },
         { icon: 'assessment', labelKey: 'nav.relatorios', route: '/relatorios', roles: ['ADMIN', 'CONSUL'] },
         { icon: 'notifications', labelKey: 'nav.notificacoes', route: '/notificacoes', roles: ['ADMIN', 'CONSUL', 'OFFICER'] },
       ],
@@ -80,11 +86,15 @@ export class App implements OnInit {
 
   constructor() {
     this.translate.setDefaultLang('pt');
-    this.translate.use('pt');
+    const saved = localStorage.getItem(App.LANG_KEY);
+    const lang = saved && ['pt', 'en', 'de', 'cs'].includes(saved) ? saved : 'pt';
+    this.currentLang.set(lang);
+    this.translate.use(lang);
   }
 
   ngOnInit(): void {
-    this.username.set(this.keycloak.getUsername());
+    const tokenParsed = this.keycloak.getKeycloakInstance()?.tokenParsed as Record<string, string> | undefined;
+    this.username.set(tokenParsed?.['preferred_username'] ?? 'User');
     this.userRoles.set(this.keycloak.getUserRoles());
   }
 
@@ -99,6 +109,9 @@ export class App implements OnInit {
 
   switchLang(lang: string): void {
     this.translate.use(lang);
+    this.currentLang.set(lang);
+    localStorage.setItem(App.LANG_KEY, lang);
+    document.documentElement.lang = lang;
   }
 
   logout(): void {

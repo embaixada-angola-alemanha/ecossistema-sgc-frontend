@@ -1,0 +1,47 @@
+{
+  "list": {
+    "success": true,
+    "data": {
+      "content": [
+        {
+          "id": "v1",
+          "cidadaoId": "c1",
+          "cidadaoNome": "João Silva",
+          "tipo": "TURISTA",
+          "estado": "SUBMETIDO",
+          "numeroVisto": "VT-2026-001",
+          "valorTaxa": 120.00,
+          "taxaPaga": false,
+          "dataSubmissao": "2026-02-15"
+        },
+        {
+          "id": "v2",
+          "cidadaoId": "c2",
+          "cidadaoNome": "Maria Santos",
+          "tipo": "TRABALHO",
+          "estado": "APROVADO",
+          "numeroVisto": "VT-2026-002",
+          "valorTaxa": 250.00,
+          "taxaPaga": true,
+          "dataSubmissao": "2026-02-10"
+        }
+      ],
+      "page": 0,
+      "size": 20,
+      "totalElements": 2,
+      "totalPages": 1,
+      "last": true
+    }
+  },
+  "create": {
+    "success": true,
+    "data": {
+      "id": "v3",
+      "cidadaoId": "c1",
+      "cidadaoNome": "João Silva",
+      "tipo": "TURISTA",
+      "estado": "RASCUNHO",
+      "dataSubmissao": "2026-02-18"
+    }
+  }
+}

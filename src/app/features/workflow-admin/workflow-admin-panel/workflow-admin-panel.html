@@ -1,0 +1,234 @@
+<div class="workflow-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <mat-icon class="header-icon">account_tree</mat-icon>
+      <h2>{{ 'workflow.title' | translate }}</h2>
+    </div>
+    <div class="header-actions">
+      <button mat-stroked-button (click)="refreshAll()">
+        <mat-icon>refresh</mat-icon>
+        {{ 'common.refresh' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Module Selector -->
+  <mat-card class="module-selector-card">
+    <mat-card-content>
+      <div class="module-tabs">
+        @for (mod of modules; track mod.key) {
+          <button
+            mat-stroked-button
+            [class.active]="selectedModule === mod.key"
+            (click)="selectedModule = mod.key; onModuleChange()">
+            <mat-icon>{{ mod.icon }}</mat-icon>
+            {{ mod.label | translate }}
+          </button>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Pipeline View -->
+  <mat-card class="pipeline-card">
+    <mat-card-header>
+      <mat-icon mat-card-avatar>linear_scale</mat-icon>
+      <mat-card-title>{{ 'workflow.pipeline' | translate }}</mat-card-title>
+      <mat-card-subtitle>{{ 'workflow.pipelineDesc' | translate }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      @if (loadingPipeline()) {
+        <sgc-loading-spinner />
+      } @else if (currentPipeline) {
+        <div class="pipeline-visual">
+          @for (stage of currentPipeline!.stages; track stage.estado; let last = $last) {
+            <div class="pipeline-stage"
+                 [class.active]="selectedEstado === stage.estado"
+                 [class.has-items]="stage.count > 0"
+                 (click)="onPipelineStageClick(stage.estado)"
+                 [matTooltip]="stage.count + ' item(s)'">
+              <div class="stage-count">{{ stage.count }}</div>
+              <div class="stage-label">{{ 'workflow.estado.' + stage.estado | translate }}</div>
+              <div class="stage-bar">
+                <div class="stage-bar-fill"
+                     [style.width.%]="getStageWidth(stage.count, currentPipeline!.total)">
+                </div>
+              </div>
+            </div>
+            @if (!last) {
+              <mat-icon class="pipeline-arrow">chevron_right</mat-icon>
+            }
+          }
+        </div>
+
+        <!-- Pipeline summary row -->
+        <div class="pipeline-summary">
+          <span class="summary-total">
+            {{ 'workflow.total' | translate }}: <strong>{{ currentPipeline!.total }}</strong>
+          </span>
+          @if (selectedEstado) {
+            <mat-chip (removed)="selectedEstado = ''; onEstadoFilterChange()">
+              {{ 'workflow.estado.' + selectedEstado | translate }}
+              <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip>
+          }
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Bulk Actions Bar -->
+  @if (hasSelection) {
+    <mat-card class="bulk-bar">
+      <mat-card-content>
+        <div class="bulk-content">
+          <span class="bulk-count">
+            <mat-icon>check_box</mat-icon>
+            {{ selectionCount }} {{ 'workflow.selected' | translate }}
+          </span>
+          <div class="bulk-actions">
+            @for (transition of commonTransitions; track transition) {
+              <button mat-stroked-button
+                      (click)="bulkAction(transition)"
+                      [disabled]="processingBulk()"
+                      [class.approve-btn]="transition === 'APROVADO' || transition === 'VERIFICADO' || transition === 'CONCLUIDO' || transition === 'EMITIDO' || transition === 'CONFIRMADO' || transition === 'COMPLETADO' || transition === 'CERTIFICADO_EMITIDO'"
+                      [class.reject-btn]="transition === 'REJEITADO' || transition === 'CANCELADO'">
+                @if (transition === 'REJEITADO' || transition === 'CANCELADO') {
+                  <mat-icon>close</mat-icon>
+                } @else {
+                  <mat-icon>check</mat-icon>
+                }
+                {{ 'workflow.estado.' + transition | translate }}
+              </button>
+            }
+            <button mat-button (click)="clearSelection()">
+              {{ 'workflow.clearSelection' | translate }}
+            </button>
+          </div>
+        </div>
+        @if (processingBulk()) {
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Queue Table -->
+  <mat-card class="queue-card">
+    <mat-card-header>
+      <mat-icon mat-card-avatar>queue</mat-icon>
+      <mat-card-title>{{ 'workflow.queue' | translate }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <!-- Filters -->
+      <div class="queue-filters">
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>{{ 'common.status' | translate }}</mat-label>
+          <mat-select [(ngModel)]="selectedEstado" (selectionChange)="onEstadoFilterChange()">
+            <mat-option value="">{{ 'workflow.allStatuses' | translate }}</mat-option>
+            @for (estado of pipelineStates; track estado) {
+              <mat-option [value]="estado">{{ 'workflow.estado.' + estado | translate }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      @if (loadingQueue()) {
+        <sgc-loading-spinner />
+      } @else {
+        <table mat-table [dataSource]="queueItems()">
+          <!-- Checkbox column -->
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+              @if (canApprove) {
+                <mat-checkbox
+                  [checked]="allSelected"
+                  [indeterminate]="someSelected"
+                  (change)="toggleAll()">
+                </mat-checkbox>
+              }
+            </th>
+            <td mat-cell *matCellDef="let row">
+              @if (canApprove) {
+                <mat-checkbox
+                  [checked]="isSelected(row.id)"
+                  (change)="toggleItem(row.id)"
+                  (click)="$event.stopPropagation()">
+                </mat-checkbox>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="numero">
+            <th mat-header-cell *matHeaderCellDef>{{ 'workflow.numero' | translate }}</th>
+            <td mat-cell *matCellDef="let row" class="mono">{{ row.numero ?? '—' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="cidadaoNome">
+            <th mat-header-cell *matHeaderCellDef>{{ 'workflow.cidadaoNome' | translate }}</th>
+            <td mat-cell *matCellDef="let row" class="name-cell">{{ row.cidadaoNome }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="tipo">
+            <th mat-header-cell *matHeaderCellDef>{{ 'common.type' | translate }}</th>
+            <td mat-cell *matCellDef="let row">{{ row.tipo }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef>{{ 'common.status' | translate }}</th>
+            <td mat-cell *matCellDef="let row"><sgc-status-badge [status]="row.estado" /></td>
+          </ng-container>
+
+          <ng-container matColumnDef="createdAt">
+            <th mat-header-cell *matHeaderCellDef>{{ 'common.createdAt' | translate }}</th>
+            <td mat-cell *matCellDef="let row">{{ row.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>{{ 'common.actions' | translate }}</th>
+            <td mat-cell *matCellDef="let row">
+              @if (canApprove && row.allowedTransitions.length > 0) {
+                <button mat-icon-button [matMenuTriggerFor]="actionMenu" (click)="$event.stopPropagation()">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #actionMenu="matMenu">
+                  @for (transition of row.allowedTransitions; track transition) {
+                    <button mat-menu-item (click)="changeEstado(row, transition)">
+                      @if (transition === 'REJEITADO' || transition === 'CANCELADO') {
+                        <mat-icon class="reject-icon">close</mat-icon>
+                      } @else {
+                        <mat-icon class="approve-icon">check</mat-icon>
+                      }
+                      <span>{{ 'workflow.estado.' + transition | translate }}</span>
+                    </button>
+                  }
+                </mat-menu>
+              }
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+              [class.selected-row]="isSelected(row.id)"></tr>
+        </table>
+
+        @if (queueItems().length === 0) {
+          <div class="no-data">
+            <mat-icon>inbox</mat-icon>
+            <span>{{ 'workflow.emptyQueue' | translate }}</span>
+          </div>
+        }
+
+        <mat-paginator
+          [length]="totalQueueItems()"
+          [pageIndex]="queuePage"
+          [pageSize]="queuePageSize"
+          [pageSizeOptions]="[10, 20, 50]"
+          (page)="onPageChange($event)"
+          showFirstLastButtons>
+        </mat-paginator>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

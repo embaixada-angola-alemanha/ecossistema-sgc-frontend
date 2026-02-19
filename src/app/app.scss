@@ -2,6 +2,26 @@
 // SGC — "Diplomacia Clássica" Dark + Gold Theme
 // ══════════════════════════════════════════════════════
 
+// ─── Skip Link (Accessibility) ───────────────────────
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 10000;
+  padding: 8px 16px;
+  background: var(--gold, #c9a84c);
+  color: var(--bg, #0e1117);
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 0 0 4px 4px;
+  text-decoration: none;
+  transition: top 0.2s;
+
+  &:focus {
+    top: 0;
+  }
+}
+
 .app-container {
   height: 100vh;
 }
@@ -50,7 +70,7 @@
 
 .brand-sub {
   font-size: 10px;
-  color: var(--text-dim);
+  color: rgba(232, 228, 220, 0.6); // ↑ contrast improved from 0.4
   letter-spacing: 2px;
   text-transform: uppercase;
   margin-top: 4px;
@@ -67,7 +87,7 @@
   font-size: 9px;
   letter-spacing: 2.5px;
   text-transform: uppercase;
-  color: var(--text-dim);
+  color: rgba(232, 228, 220, 0.6); // ↑ contrast improved
   padding: 12px 24px 6px;
 }
 
@@ -79,13 +99,19 @@
   cursor: pointer;
   transition: all 0.2s;
   font-size: 13px;
-  color: rgba(232, 228, 220, 0.55);
+  color: rgba(232, 228, 220, 0.72); // ↑ contrast improved from 0.55
   font-weight: 400;
   text-decoration: none;
 
   &:hover {
     background: var(--gold-dim);
     color: var(--text);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--gold, #c9a84c);
+    outline-offset: -2px;
+    border-radius: 4px;
   }
 
   &.active {
@@ -119,7 +145,7 @@
     font-size: 16px;
     width: 16px;
     height: 16px;
-    color: rgba(232, 228, 220, 0.45);
+    color: rgba(232, 228, 220, 0.6); // ↑ contrast improved from 0.45
   }
 }
 
@@ -143,10 +169,15 @@
 }
 
 .menu-toggle {
-  color: var(--text-dim) !important;
+  color: rgba(232, 228, 220, 0.7) !important; // ↑ contrast improved
 
   &:hover {
     color: var(--gold) !important;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--gold, #c9a84c);
+    outline-offset: 2px;
   }
 }
 
@@ -157,11 +188,50 @@
 }
 
 .top-btn {
-  color: var(--text-dim) !important;
+  color: rgba(232, 228, 220, 0.7) !important; // ↑ contrast improved
 
   &:hover {
     color: var(--gold) !important;
   }
+
+  &:focus-visible {
+    outline: 2px solid var(--gold, #c9a84c);
+    outline-offset: 2px;
+  }
+}
+
+// Language Switcher
+.lang-btn {
+  color: rgba(232, 228, 220, 0.7) !important; // ↑ contrast improved
+  min-width: auto !important;
+  padding: 0 8px !important;
+
+  .lang-code {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-left: 2px;
+  }
+
+  &:hover {
+    color: var(--gold) !important;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--gold, #c9a84c);
+    outline-offset: 2px;
+  }
+}
+
+.lang-flag {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+::ng-deep .active-lang {
+  background: var(--gold-dim) !important;
+  color: var(--gold) !important;
+  font-weight: 500;
 }
 
 // User Avatar
@@ -184,6 +254,11 @@
   &:hover {
     box-shadow: 0 4px 16px rgba(201, 168, 76, 0.3);
   }
+
+  &:focus-visible {
+    outline: 2px solid var(--gold, #c9a84c);
+    outline-offset: 3px;
+  }
 }
 
 // Page Content
@@ -205,4 +280,19 @@
   mat-icon {
     color: var(--gold);
   }
+}
+
+// ─── Global Focus Styles (Accessibility) ──────────────
+// Ensure all interactive elements have visible focus indicators
+*:focus-visible {
+  outline: 2px solid var(--gold, #c9a84c);
+  outline-offset: 2px;
+}
+
+// Override for Material buttons which already have ripple
+.mat-mdc-button:focus-visible,
+.mat-mdc-icon-button:focus-visible,
+.mat-mdc-fab:focus-visible {
+  outline: 2px solid var(--gold, #c9a84c);
+  outline-offset: 2px;
 }

@@ -6,7 +6,8 @@ export class AuthService {
   private readonly keycloak = inject(KeycloakService);
 
   getUsername(): string {
-    return this.keycloak.getUsername();
+    const tokenParsed = this.keycloak.getKeycloakInstance()?.tokenParsed as Record<string, string> | undefined;
+    return tokenParsed?.['preferred_username'] ?? 'User';
   }
 
   getUserRoles(): string[] {

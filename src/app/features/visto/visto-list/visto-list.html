@@ -79,7 +79,8 @@
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef>{{ 'common.actions' | translate }}</th>
           <td mat-cell *matCellDef="let row">
-            <button mat-icon-button [matMenuTriggerFor]="rowMenu" (click)="$event.stopPropagation()">
+            <button mat-icon-button [matMenuTriggerFor]="rowMenu" (click)="$event.stopPropagation()"
+                    [attr.aria-label]="'Actions for ' + (row.cidadaoNome || row.numeroVisto)">
               <mat-icon>more_vert</mat-icon>
             </button>
             <mat-menu #rowMenu="matMenu">
@@ -128,7 +129,8 @@
         [pageSize]="pageSize"
         [pageSizeOptions]="[10, 20, 50]"
         (page)="onPageChange($event)"
-        showFirstLastButtons>
+        showFirstLastButtons
+        aria-label="Visa list pagination">
       </mat-paginator>
     </mat-card>
   }

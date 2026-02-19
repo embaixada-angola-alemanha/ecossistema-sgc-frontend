@@ -14,6 +14,7 @@ export function initializeKeycloak(keycloak: KeycloakService): () => Promise<boo
         checkLoginIframe: false,
         pkceMethod: 'S256',
       },
+      loadUserProfileAtStartUp: false,
       enableBearerInterceptor: true,
       bearerPrefix: 'Bearer',
       bearerExcludedUrls: ['/assets'],

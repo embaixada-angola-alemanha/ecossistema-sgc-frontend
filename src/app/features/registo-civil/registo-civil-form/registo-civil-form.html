@@ -1,0 +1,283 @@
+@if (loading()) {
+  <sgc-loading-spinner />
+} @else {
+  <div class="form-page">
+    <div class="page-header">
+      <button mat-icon-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h2>{{ (isEdit ? 'registoCivil.editRegisto' : 'registoCivil.newRegisto') | translate }}</h2>
+    </div>
+
+    <mat-stepper linear #stepper>
+      <!-- Step 1: Select Citizen -->
+      <mat-step [stepControl]="cidadaoForm">
+        <ng-template matStepLabel>{{ 'registoCivil.step.cidadao' | translate }}</ng-template>
+        <form [formGroup]="cidadaoForm" class="step-content">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ 'registoCivil.cidadaoNome' | translate }}</mat-label>
+            <mat-select formControlName="cidadaoId" (selectionChange)="onCidadaoSelect($event.value)">
+              @for (c of cidadaos(); track c.id) {
+                <mat-option [value]="c.id">{{ c.nomeCompleto }} ({{ c.numeroPassaporte }})</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          @if (selectedCidadao()) {
+            <mat-card class="info-card">
+              <mat-card-content>
+                <div class="info-grid">
+                  <div><span class="info-label">{{ 'cidadao.nomeCompleto' | translate }}</span><span>{{ selectedCidadao()!.nomeCompleto }}</span></div>
+                  <div><span class="info-label">{{ 'cidadao.numeroPassaporte' | translate }}</span><span class="mono">{{ selectedCidadao()!.numeroPassaporte }}</span></div>
+                  @if (selectedCidadao()!.dataNascimento) {
+                    <div><span class="info-label">{{ 'cidadao.dataNascimento' | translate }}</span><span>{{ selectedCidadao()!.dataNascimento | date:'dd/MM/yyyy' }}</span></div>
+                  }
+                </div>
+              </mat-card-content>
+            </mat-card>
+          }
+
+          <div class="step-actions">
+            <button mat-raised-button color="primary" matStepperNext [disabled]="cidadaoForm.invalid">
+              {{ 'common.next' | translate }}
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- Step 2: Type & Event -->
+      <mat-step [stepControl]="tipoForm">
+        <ng-template matStepLabel>{{ 'registoCivil.step.tipo' | translate }}</ng-template>
+        <form [formGroup]="tipoForm" class="step-content">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ 'registoCivil.tipoRegisto' | translate }}</mat-label>
+            <mat-select formControlName="tipo">
+              @for (tipo of tipoValues; track tipo) {
+                <mat-option [value]="tipo">{{ 'registoCivil.tipo.' + tipo | translate }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <div [formGroup]="eventForm" class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'registoCivil.dataEvento' | translate }}</mat-label>
+              <input matInput [matDatepicker]="eventPicker" formControlName="dataEvento">
+              <mat-datepicker-toggle matIconSuffix [for]="eventPicker"></mat-datepicker-toggle>
+              <mat-datepicker #eventPicker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'registoCivil.localEvento' | translate }}</mat-label>
+              <input matInput formControlName="localEvento">
+            </mat-form-field>
+          </div>
+
+          <div [formGroup]="eventForm">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ 'registoCivil.observacoes' | translate }}</mat-label>
+              <textarea matInput formControlName="observacoes" rows="3"></textarea>
+            </mat-form-field>
+          </div>
+
+          <div class="step-actions">
+            <button mat-stroked-button matStepperPrevious>
+              <mat-icon>arrow_back</mat-icon>
+              {{ 'common.previous' | translate }}
+            </button>
+            <button mat-raised-button color="primary" matStepperNext [disabled]="tipoForm.invalid">
+              {{ 'common.next' | translate }}
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- Step 3: Type-Specific Fields -->
+      <mat-step>
+        <ng-template matStepLabel>{{ 'registoCivil.step.details' | translate }}</ng-template>
+        <form [formGroup]="specificForm" class="step-content">
+
+          @if (selectedTipo === 'NASCIMENTO') {
+            <h3 class="section-title">{{ 'registoCivil.birthDetails' | translate }}</h3>
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'registoCivil.nomePai' | translate }}</mat-label>
+                <input matInput formControlName="nomePai">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'registoCivil.nomeMae' | translate }}</mat-label>
+                <input matInput formControlName="nomeMae">
+              </mat-form-field>
+            </div>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ 'registoCivil.localNascimento' | translate }}</mat-label>
+              <input matInput formControlName="localNascimento">
+            </mat-form-field>
+          }
+
+          @if (selectedTipo === 'CASAMENTO') {
+            <h3 class="section-title">{{ 'registoCivil.marriageDetails' | translate }}</h3>
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'registoCivil.nomeConjuge1' | translate }}</mat-label>
+                <input matInput formControlName="nomeConjuge1">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'registoCivil.nomeConjuge2' | translate }}</mat-label>
+                <input matInput formControlName="nomeConjuge2">
+              </mat-form-field>
+            </div>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ 'registoCivil.regimeCasamento' | translate }}</mat-label>
+              <mat-select formControlName="regimeCasamento">
+                <mat-option value="Comunhão de bens">{{ 'registoCivil.regime.comunhao' | translate }}</mat-option>
+                <mat-option value="Separação de bens">{{ 'registoCivil.regime.separacao' | translate }}</mat-option>
+                <mat-option value="Comunhão de adquiridos">{{ 'registoCivil.regime.adquiridos' | translate }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          }
+
+          @if (selectedTipo === 'OBITO') {
+            <h3 class="section-title">{{ 'registoCivil.deathDetails' | translate }}</h3>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ 'registoCivil.causaObito' | translate }}</mat-label>
+              <textarea matInput formControlName="causaObito" rows="3"></textarea>
+            </mat-form-field>
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'registoCivil.localObito' | translate }}</mat-label>
+                <input matInput formControlName="localObito">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'registoCivil.dataObito' | translate }}</mat-label>
+                <input matInput [matDatepicker]="obitoPicker" formControlName="dataObito">
+                <mat-datepicker-toggle matIconSuffix [for]="obitoPicker"></mat-datepicker-toggle>
+                <mat-datepicker #obitoPicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+          }
+
+          @if (!selectedTipo) {
+            <div class="no-type-selected">
+              <mat-icon>info</mat-icon>
+              <span>{{ 'registoCivil.selectTypeFirst' | translate }}</span>
+            </div>
+          }
+
+          <div class="step-actions">
+            <button mat-stroked-button matStepperPrevious>
+              <mat-icon>arrow_back</mat-icon>
+              {{ 'common.previous' | translate }}
+            </button>
+            <button mat-raised-button color="primary" matStepperNext>
+              {{ 'common.next' | translate }}
+              <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- Step 4: Review & Submit -->
+      <mat-step>
+        <ng-template matStepLabel>{{ 'registoCivil.step.review' | translate }}</ng-template>
+        <div class="step-content">
+          <mat-card class="review-card">
+            <mat-card-content>
+              <div class="review-grid">
+                <div class="review-item">
+                  <span class="review-label">{{ 'registoCivil.cidadaoNome' | translate }}</span>
+                  <span>{{ getCidadaoName(cidadaoForm.value.cidadaoId) }}</span>
+                </div>
+                <div class="review-item">
+                  <span class="review-label">{{ 'common.type' | translate }}</span>
+                  <span>{{ 'registoCivil.tipo.' + tipoForm.value.tipo | translate }}</span>
+                </div>
+                @if (eventForm.value.dataEvento) {
+                  <div class="review-item">
+                    <span class="review-label">{{ 'registoCivil.dataEvento' | translate }}</span>
+                    <span>{{ eventForm.value.dataEvento | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                }
+                @if (eventForm.value.localEvento) {
+                  <div class="review-item">
+                    <span class="review-label">{{ 'registoCivil.localEvento' | translate }}</span>
+                    <span>{{ eventForm.value.localEvento }}</span>
+                  </div>
+                }
+
+                @if (selectedTipo === 'NASCIMENTO') {
+                  @if (specificForm.value.nomePai) {
+                    <div class="review-item">
+                      <span class="review-label">{{ 'registoCivil.nomePai' | translate }}</span>
+                      <span>{{ specificForm.value.nomePai }}</span>
+                    </div>
+                  }
+                  @if (specificForm.value.nomeMae) {
+                    <div class="review-item">
+                      <span class="review-label">{{ 'registoCivil.nomeMae' | translate }}</span>
+                      <span>{{ specificForm.value.nomeMae }}</span>
+                    </div>
+                  }
+                }
+
+                @if (selectedTipo === 'CASAMENTO') {
+                  @if (specificForm.value.nomeConjuge1) {
+                    <div class="review-item">
+                      <span class="review-label">{{ 'registoCivil.nomeConjuge1' | translate }}</span>
+                      <span>{{ specificForm.value.nomeConjuge1 }}</span>
+                    </div>
+                  }
+                  @if (specificForm.value.nomeConjuge2) {
+                    <div class="review-item">
+                      <span class="review-label">{{ 'registoCivil.nomeConjuge2' | translate }}</span>
+                      <span>{{ specificForm.value.nomeConjuge2 }}</span>
+                    </div>
+                  }
+                  @if (specificForm.value.regimeCasamento) {
+                    <div class="review-item">
+                      <span class="review-label">{{ 'registoCivil.regimeCasamento' | translate }}</span>
+                      <span>{{ specificForm.value.regimeCasamento }}</span>
+                    </div>
+                  }
+                }
+
+                @if (selectedTipo === 'OBITO') {
+                  @if (specificForm.value.causaObito) {
+                    <div class="review-item full">
+                      <span class="review-label">{{ 'registoCivil.causaObito' | translate }}</span>
+                      <span>{{ specificForm.value.causaObito }}</span>
+                    </div>
+                  }
+                  @if (specificForm.value.localObito) {
+                    <div class="review-item">
+                      <span class="review-label">{{ 'registoCivil.localObito' | translate }}</span>
+                      <span>{{ specificForm.value.localObito }}</span>
+                    </div>
+                  }
+                }
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <div class="step-actions">
+            <button mat-stroked-button matStepperPrevious>
+              <mat-icon>arrow_back</mat-icon>
+              {{ 'common.previous' | translate }}
+            </button>
+            <button mat-stroked-button (click)="saveDraft()" [disabled]="saving()">
+              <mat-icon>save</mat-icon>
+              {{ 'common.saveDraft' | translate }}
+            </button>
+            <button mat-raised-button color="primary" (click)="submitRegisto(true)" [disabled]="saving()">
+              @if (saving()) {
+                <mat-icon class="spin">sync</mat-icon>
+              }
+              {{ 'registoCivil.submit' | translate }}
+            </button>
+          </div>
+        </div>
+      </mat-step>
+    </mat-stepper>
+  </div>
+}

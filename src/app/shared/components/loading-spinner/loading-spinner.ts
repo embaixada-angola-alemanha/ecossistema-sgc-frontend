@@ -6,7 +6,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   standalone: true,
   imports: [MatProgressSpinnerModule],
   template: `
-    <div class="spinner-container">
+    <div class="spinner-container" role="status" aria-live="polite" aria-label="Loading">
       <mat-spinner diameter="48"></mat-spinner>
     </div>
   `,
