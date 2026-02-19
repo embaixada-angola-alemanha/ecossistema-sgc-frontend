@@ -1,8 +1,8 @@
 export const environment = {
-  production: true,
+  production: false,
   apiBaseUrl: '/api/v1',
   keycloak: {
-    url: 'https://auth.embaixada-angola.site',
+    url: 'https://stg-auth.embaixada-angola.site',
     realm: 'ecossistema',
     clientId: 'sgc-frontend',
   },
