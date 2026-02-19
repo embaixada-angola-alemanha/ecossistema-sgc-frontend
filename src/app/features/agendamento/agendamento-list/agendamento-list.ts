@@ -22,6 +22,7 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { AgendamentoService } from '../../../core/services/agendamento.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { CitizenContextService } from '../../../core/services/citizen-context.service';
 import {
   Agendamento, EstadoAgendamento, TipoAgendamento,
   TIPO_AGENDAMENTO_VALUES, ESTADO_AGENDAMENTO_VALUES, AGENDAMENTO_TRANSITIONS,
@@ -57,6 +58,7 @@ interface CalendarDay {
 export class AgendamentoList implements OnInit {
   private readonly agendamentoService = inject(AgendamentoService);
   private readonly authService = inject(AuthService);
+  private readonly citizenContext = inject(CitizenContextService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly router = inject(Router);
@@ -106,7 +108,7 @@ export class AgendamentoList implements OnInit {
 
   private readonly searchSubject = new Subject<string>();
 
-  readonly canCreate = this.authService.hasAnyRole('ADMIN', 'CONSUL', 'OFFICER');
+  readonly canCreate = this.authService.hasAnyRole('ADMIN', 'CONSUL', 'OFFICER', 'CITIZEN');
   readonly canEdit = this.authService.hasAnyRole('ADMIN', 'CONSUL', 'OFFICER');
   readonly canChangeStatus = this.authService.hasAnyRole('ADMIN', 'CONSUL', 'OFFICER');
   readonly canDelete = this.authService.isAdmin();
@@ -304,7 +306,8 @@ export class AgendamentoList implements OnInit {
     const dataInicio = calStart.toISOString();
     const dataFim = calEnd.toISOString();
 
-    this.agendamentoService.getAll(0, 500, undefined,
+    const cidadaoId = this.citizenContext.cidadaoId() ?? undefined;
+    this.agendamentoService.getAll(0, 500, cidadaoId,
       this.estadoFilter || undefined,
       this.tipoFilter || undefined,
       dataInicio, dataFim,
@@ -343,10 +346,11 @@ export class AgendamentoList implements OnInit {
   }
 
   private loadTableData(): void {
+    const cidadaoId = this.citizenContext.cidadaoId() ?? undefined;
     this.agendamentoService.getAll(
       this.page,
       this.pageSize,
-      undefined,
+      cidadaoId,
       this.estadoFilter || undefined,
       this.tipoFilter || undefined,
     ).subscribe({

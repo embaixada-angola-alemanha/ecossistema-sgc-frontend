@@ -9,6 +9,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { KeycloakService } from 'keycloak-angular';
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { CitizenContextService } from './core/services/citizen-context.service';
 
 interface NavItem {
   icon: string;
@@ -39,6 +40,7 @@ export class App implements OnInit {
   private readonly translate = inject(TranslateService);
   private readonly keycloak = inject(KeycloakService);
   private readonly breakpointObserver = inject(BreakpointObserver);
+  private readonly citizenContext = inject(CitizenContextService);
 
   @ViewChild('sidenav') sidenav!: MatSidenav;
 
@@ -65,17 +67,18 @@ export class App implements OnInit {
       label: 'Principal',
       items: [
         { icon: 'dashboard', labelKey: 'nav.dashboard', route: '/dashboard', roles: [] },
+        { icon: 'person', labelKey: 'nav.meuPerfil', route: '/cidadaos/me', roles: ['CITIZEN'] },
         { icon: 'people', labelKey: 'nav.cidadaos', route: '/cidadaos', roles: ['ADMIN', 'CONSUL', 'OFFICER', 'VIEWER'] },
-        { icon: 'flight', labelKey: 'nav.vistos', route: '/vistos', roles: ['ADMIN', 'CONSUL', 'OFFICER', 'VIEWER'] },
-        { icon: 'event', labelKey: 'nav.agendamentos', route: '/agendamentos', roles: ['ADMIN', 'CONSUL', 'OFFICER', 'VIEWER'] },
+        { icon: 'flight', labelKey: 'nav.vistos', route: '/vistos', roles: ['ADMIN', 'CONSUL', 'OFFICER', 'CITIZEN', 'VIEWER'] },
+        { icon: 'event', labelKey: 'nav.agendamentos', route: '/agendamentos', roles: ['ADMIN', 'CONSUL', 'OFFICER', 'CITIZEN', 'VIEWER'] },
       ],
     },
     {
       label: 'Operações',
       items: [
-        { icon: 'article', labelKey: 'nav.registosCivis', route: '/registos-civis', roles: ['ADMIN', 'CONSUL', 'OFFICER', 'VIEWER'] },
-        { icon: 'gavel', labelKey: 'nav.servicosNotariais', route: '/servicos-notariais', roles: ['ADMIN', 'CONSUL', 'OFFICER', 'VIEWER'] },
-        { icon: 'folder', labelKey: 'nav.documentos', route: '/documentos', roles: ['ADMIN', 'CONSUL', 'OFFICER', 'VIEWER'] },
+        { icon: 'article', labelKey: 'nav.registosCivis', route: '/registos-civis', roles: ['ADMIN', 'CONSUL', 'OFFICER', 'CITIZEN', 'VIEWER'] },
+        { icon: 'gavel', labelKey: 'nav.servicosNotariais', route: '/servicos-notariais', roles: ['ADMIN', 'CONSUL', 'OFFICER', 'CITIZEN', 'VIEWER'] },
+        { icon: 'folder', labelKey: 'nav.documentos', route: '/documentos', roles: ['ADMIN', 'CONSUL', 'OFFICER', 'CITIZEN', 'VIEWER'] },
       ],
     },
     {
@@ -102,6 +105,7 @@ export class App implements OnInit {
     const tokenParsed = this.keycloak.getKeycloakInstance()?.tokenParsed as Record<string, string> | undefined;
     this.username.set(tokenParsed?.['preferred_username'] ?? 'User');
     this.userRoles.set(this.keycloak.getUserRoles());
+    this.citizenContext.init();
 
     this.breakpointObserver.observe(['(max-width: 768px)']).subscribe(result => {
       if (result.matches) {

@@ -12,6 +12,7 @@
   "nav.userAdmin": "Benutzer",
   "nav.relatorios": "Berichte",
   "nav.notificacoes": "Benachrichtigungen",
+  "nav.meuPerfil": "Mein Profil",
 
   "module.dashboard": "Dashboard",
   "module.cidadaos": "Buergerverwaltung",
@@ -417,6 +418,10 @@
   "dashboard.newAppointment": "Neuer Termin",
   "dashboard.noRecentVisas": "Keine aktuellen Visa",
   "dashboard.noUpcomingAppointments": "Keine kommenden Termine",
+  "dashboard.myPendingVisas": "Meine ausstehenden Visa",
+  "dashboard.myAppointments": "Meine Termine",
+  "dashboard.myDocuments": "Meine Dokumente",
+  "dashboard.notLinked": "Konto nicht mit einem Bürgerprofil verknüpft. Kontaktieren Sie die Botschaft.",
 
   "status.RASCUNHO": "Entwurf",
   "status.ACTIVO": "Aktiv",

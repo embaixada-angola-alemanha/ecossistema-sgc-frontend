@@ -20,6 +20,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { DocumentoService } from '../../../core/services/documento.service';
 import { CidadaoService } from '../../../core/services/cidadao.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { CitizenContextService } from '../../../core/services/citizen-context.service';
 import { Cidadao } from '../../../core/models/cidadao.model';
 import {
   Documento, EstadoDocumento, TipoDocumento,
@@ -50,6 +51,7 @@ export class DocumentoList implements OnInit {
   private readonly documentoService = inject(DocumentoService);
   private readonly cidadaoService = inject(CidadaoService);
   private readonly authService = inject(AuthService);
+  private readonly citizenContext = inject(CitizenContextService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly translate = inject(TranslateService);
@@ -72,11 +74,22 @@ export class DocumentoList implements OnInit {
   private readonly searchSubject = new Subject<string>();
   cidadaoSearch = '';
 
-  readonly canCreate = this.authService.hasAnyRole('ADMIN', 'CONSUL', 'OFFICER');
+  readonly canCreate = this.authService.hasAnyRole('ADMIN', 'CONSUL', 'OFFICER', 'CITIZEN');
   readonly canEdit = this.authService.hasAnyRole('ADMIN', 'CONSUL', 'OFFICER');
   readonly canDelete = this.authService.hasAnyRole('ADMIN', 'CONSUL');
 
+  readonly isCitizenOnly = this.authService.isCitizenOnly();
+
   ngOnInit(): void {
+    if (this.isCitizenOnly) {
+      const cid = this.citizenContext.cidadaoId();
+      if (cid) {
+        this.cidadaoId = cid;
+        this.loadDocuments();
+      }
+      return;
+    }
+
     this.searchSubject.pipe(
       debounceTime(300),
       distinctUntilChanged(),

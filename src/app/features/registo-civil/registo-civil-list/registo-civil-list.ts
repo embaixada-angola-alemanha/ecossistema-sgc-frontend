@@ -20,6 +20,7 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { RegistoCivilService } from '../../../core/services/registo-civil.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { CitizenContextService } from '../../../core/services/citizen-context.service';
 import {
   RegistoCivil, EstadoRegistoCivil, TipoRegistoCivil,
   TIPO_REGISTO_CIVIL_VALUES, ESTADO_REGISTO_CIVIL_VALUES, REGISTO_CIVIL_TRANSITIONS,
@@ -47,6 +48,7 @@ import { ConfirmDialog, ConfirmDialogData } from '../../../shared/components/con
 export class RegistoCivilList implements OnInit {
   private readonly registoService = inject(RegistoCivilService);
   private readonly authService = inject(AuthService);
+  private readonly citizenContext = inject(CitizenContextService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly translate = inject(TranslateService);
@@ -69,7 +71,7 @@ export class RegistoCivilList implements OnInit {
 
   private readonly searchSubject = new Subject<string>();
 
-  readonly canCreate = this.authService.hasAnyRole('ADMIN', 'CONSUL', 'OFFICER');
+  readonly canCreate = this.authService.hasAnyRole('ADMIN', 'CONSUL', 'OFFICER', 'CITIZEN');
   readonly canEdit = this.authService.hasAnyRole('ADMIN', 'CONSUL', 'OFFICER');
   readonly canChangeStatus = this.authService.hasAnyRole('ADMIN', 'CONSUL');
   readonly canDelete = this.authService.isAdmin();
@@ -156,10 +158,11 @@ export class RegistoCivilList implements OnInit {
 
   private loadData(): void {
     this.loading.set(true);
+    const cidadaoId = this.citizenContext.cidadaoId() ?? undefined;
     this.registoService.getAll(
       this.page,
       this.pageSize,
-      undefined,
+      cidadaoId,
       this.estadoFilter || undefined,
       this.tipoFilter || undefined,
     ).subscribe({

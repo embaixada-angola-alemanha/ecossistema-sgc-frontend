@@ -6,6 +6,7 @@ import { registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
 import localeDe from '@angular/common/locales/de';
 import localeEn from '@angular/common/locales/en';
+import localeCs from '@angular/common/locales/cs';
 import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
 import { TranslateModule } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -16,10 +17,11 @@ import { authInterceptor } from './core/auth/auth.interceptor';
 registerLocaleData(localePt, 'pt');
 registerLocaleData(localeDe, 'de');
 registerLocaleData(localeEn, 'en');
+registerLocaleData(localeCs, 'cs');
 
 function getInitialLocale(): string {
   const saved = localStorage.getItem('sgc-lang');
-  const map: Record<string, string> = { pt: 'pt', de: 'de', en: 'en', cs: 'pt' };
+  const map: Record<string, string> = { pt: 'pt', de: 'de', en: 'en', cs: 'cs' };
   return map[saved ?? 'pt'] ?? 'pt';
 }
 
@@ -31,7 +33,7 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(
       KeycloakAngularModule,
       TranslateModule.forRoot({
-        defaultLanguage: 'pt',
+        fallbackLang: 'pt',
       }),
     ),
     provideTranslateHttpLoader({ prefix: './assets/i18n/', suffix: '.json' }),

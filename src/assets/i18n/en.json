@@ -12,6 +12,7 @@
   "nav.userAdmin": "Users",
   "nav.relatorios": "Reports",
   "nav.notificacoes": "Notifications",
+  "nav.meuPerfil": "My Profile",
 
   "module.dashboard": "Dashboard",
   "module.cidadaos": "Citizen Management",
@@ -417,6 +418,10 @@
   "dashboard.newAppointment": "New Appointment",
   "dashboard.noRecentVisas": "No recent visas",
   "dashboard.noUpcomingAppointments": "No upcoming appointments",
+  "dashboard.myPendingVisas": "My Pending Visas",
+  "dashboard.myAppointments": "My Appointments",
+  "dashboard.myDocuments": "My Documents",
+  "dashboard.notLinked": "Account not linked to a citizen profile. Contact the embassy.",
 
   "status.RASCUNHO": "Draft",
   "status.ACTIVO": "Active",

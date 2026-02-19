@@ -20,6 +20,7 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { VistoService } from '../../../core/services/visto.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { CitizenContextService } from '../../../core/services/citizen-context.service';
 import { Visto, EstadoVisto, TipoVisto, TIPO_VISTO_VALUES, ESTADO_VISTO_VALUES, ALLOWED_TRANSITIONS } from '../../../core/models/visto.model';
 import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
@@ -44,6 +45,7 @@ import { ConfirmDialog, ConfirmDialogData } from '../../../shared/components/con
 export class VistoList implements OnInit {
   private readonly vistoService = inject(VistoService);
   private readonly authService = inject(AuthService);
+  private readonly citizenContext = inject(CitizenContextService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly router = inject(Router);
@@ -66,7 +68,7 @@ export class VistoList implements OnInit {
 
   private readonly searchSubject = new Subject<string>();
 
-  readonly canCreate = this.authService.hasAnyRole('ADMIN', 'CONSUL', 'OFFICER');
+  readonly canCreate = this.authService.hasAnyRole('ADMIN', 'CONSUL', 'OFFICER', 'CITIZEN');
   readonly canEdit = this.authService.hasAnyRole('ADMIN', 'CONSUL', 'OFFICER');
   readonly canChangeStatus = this.authService.hasAnyRole('ADMIN', 'CONSUL');
   readonly canDelete = this.authService.isAdmin();
@@ -153,10 +155,11 @@ export class VistoList implements OnInit {
 
   private loadData(): void {
     this.loading.set(true);
+    const cidadaoId = this.citizenContext.cidadaoId() ?? undefined;
     this.vistoService.getAll(
       this.page,
       this.pageSize,
-      undefined,
+      cidadaoId,
       this.estadoFilter || undefined,
       this.tipoFilter || undefined,
     ).subscribe({

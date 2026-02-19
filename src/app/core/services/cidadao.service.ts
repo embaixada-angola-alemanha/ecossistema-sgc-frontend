@@ -29,6 +29,12 @@ export class CidadaoService {
       .pipe(map((r) => r.data));
   }
 
+  getMe(): Observable<Cidadao> {
+    return this.http
+      .get<ApiResponse<Cidadao>>(`${this.baseUrl}/me`)
+      .pipe(map((r) => r.data));
+  }
+
   getById(id: string): Observable<Cidadao> {
     return this.http
       .get<ApiResponse<Cidadao>>(`${this.baseUrl}/${id}`)

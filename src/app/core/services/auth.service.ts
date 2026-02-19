@@ -31,6 +31,20 @@ export class AuthService {
     return this.hasRole('CONSUL');
   }
 
+  isCitizen(): boolean {
+    return this.hasRole('CITIZEN');
+  }
+
+  isCitizenOnly(): boolean {
+    if (!this.isCitizen()) return false;
+    const staffRoles = ['ADMIN', 'CONSUL', 'OFFICER', 'EDITOR', 'VIEWER'];
+    return !staffRoles.some((role) => this.hasRole(role));
+  }
+
+  isStaff(): boolean {
+    return this.hasAnyRole('ADMIN', 'CONSUL', 'OFFICER', 'EDITOR', 'VIEWER');
+  }
+
   async getToken(): Promise<string> {
     return this.keycloak.getToken();
   }

@@ -7,10 +7,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { TranslateModule } from '@ngx-translate/core';
 import { forkJoin } from 'rxjs';
 
+import { AuthService } from '../../../core/services/auth.service';
 import { CidadaoService } from '../../../core/services/cidadao.service';
 import { VistoService } from '../../../core/services/visto.service';
 import { AgendamentoService } from '../../../core/services/agendamento.service';
 import { RelatorioService } from '../../../core/services/relatorio.service';
+import { CitizenContextService } from '../../../core/services/citizen-context.service';
 import { Visto } from '../../../core/models/visto.model';
 import { Agendamento } from '../../../core/models/agendamento.model';
 import { DashboardResumo } from '../../../core/models/relatorio.model';
@@ -31,14 +33,17 @@ import { LoadingSpinner } from '../../../shared/components/loading-spinner/loadi
   styleUrl: './dashboard-home.scss',
 })
 export class DashboardHome implements OnInit {
+  private readonly authService = inject(AuthService);
   private readonly cidadaoService = inject(CidadaoService);
   private readonly vistoService = inject(VistoService);
   private readonly agendamentoService = inject(AgendamentoService);
   private readonly relatorioService = inject(RelatorioService);
+  private readonly citizenContext = inject(CitizenContextService);
   private readonly router = inject(Router);
 
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
+  readonly isCitizenOnly = this.authService.isCitizenOnly();
 
   readonly totalCitizens = signal(0);
   readonly pendingVisas = signal(0);
@@ -56,6 +61,8 @@ export class DashboardHome implements OnInit {
     this.loading.set(true);
     this.error.set(null);
 
+    const cidadaoId = this.isCitizenOnly ? this.citizenContext.cidadaoId() ?? undefined : undefined;
+
     const today = new Date().toISOString().split('T')[0];
     const todayStart = `${today}T00:00:00`;
     const todayEnd = `${today}T23:59:59`;
@@ -63,12 +70,16 @@ export class DashboardHome implements OnInit {
     forkJoin({
       dashboard: this.relatorioService.getDashboard(),
       cidadaos: this.cidadaoService.getAll(0, 1),
-      recentVisas: this.vistoService.getAll(0, 5),
-      todayAppointments: this.agendamentoService.getAll(0, 5, undefined, undefined, undefined, todayStart, todayEnd),
-      upcomingAppointments: this.agendamentoService.getAll(0, 5, undefined, 'PENDENTE'),
+      recentVisas: this.vistoService.getAll(0, 5, cidadaoId),
+      todayAppointments: this.agendamentoService.getAll(0, 5, cidadaoId, undefined, undefined, todayStart, todayEnd),
+      upcomingAppointments: this.agendamentoService.getAll(0, 5, cidadaoId, 'PENDENTE'),
     }).subscribe({
       next: ({ dashboard, cidadaos, recentVisas, todayAppointments, upcomingAppointments }) => {
-        this.totalCitizens.set(cidadaos.totalElements);
+        if (this.isCitizenOnly) {
+          this.totalCitizens.set(dashboard.totalGeral);
+        } else {
+          this.totalCitizens.set(cidadaos.totalElements);
+        }
 
         const pendingVisaCount = this.countPendingVisas(dashboard);
         this.pendingVisas.set(pendingVisaCount);

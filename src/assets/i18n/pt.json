@@ -12,6 +12,7 @@
   "nav.userAdmin": "Utilizadores",
   "nav.relatorios": "Relatorios",
   "nav.notificacoes": "Notificacoes",
+  "nav.meuPerfil": "Meu Perfil",
 
   "module.dashboard": "Painel de Controlo",
   "module.cidadaos": "Gestao de Cidadaos",
@@ -417,6 +418,10 @@
   "dashboard.newAppointment": "Novo Agendamento",
   "dashboard.noRecentVisas": "Sem vistos recentes",
   "dashboard.noUpcomingAppointments": "Sem agendamentos proximos",
+  "dashboard.myPendingVisas": "Meus Vistos Pendentes",
+  "dashboard.myAppointments": "Meus Agendamentos",
+  "dashboard.myDocuments": "Meus Documentos",
+  "dashboard.notLinked": "Conta não associada a perfil de cidadão. Contacte a embaixada.",
 
   "status.RASCUNHO": "Rascunho",
   "status.ACTIVO": "Activo",

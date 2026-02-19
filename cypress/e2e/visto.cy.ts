@@ -2,7 +2,7 @@ describe('Visto Module', () => {
   beforeEach(() => {
     cy.login('ADMIN');
     cy.fixture('visto').then((data) => {
-      cy.intercept('GET', '**/api/v1/vistos?*', data.list).as('getVistos');
+      cy.intercept('GET', '**/api/v1/visas?*', data.list).as('getVistos');
     });
     cy.fixture('cidadao').then((data) => {
       cy.intercept('GET', '**/api/v1/cidadaos?*', data.list).as('getCidadaos');
@@ -36,7 +36,7 @@ describe('Visto Module', () => {
 
   it('should open visa detail dialog', () => {
     cy.fixture('visto').then((data) => {
-      cy.intercept('GET', '**/api/v1/vistos/v1', {
+      cy.intercept('GET', '**/api/v1/visas/v1', {
         success: true,
         data: data.list.data.content[0],
       }).as('getVisto');
@@ -64,7 +64,7 @@ describe('Visto Module', () => {
   });
 
   it('should handle empty results', () => {
-    cy.intercept('GET', '**/api/v1/vistos?*', {
+    cy.intercept('GET', '**/api/v1/visas?*', {
       success: true,
       data: { content: [], page: 0, size: 20, totalElements: 0, totalPages: 0, last: true },
     }).as('getVistosEmpty');

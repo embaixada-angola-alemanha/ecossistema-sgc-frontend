@@ -60,7 +60,8 @@ export const routes: Routes = [
   {
     path: 'notificacoes',
     loadChildren: () => import('./features/notificacao/notificacao.routes').then((m) => m.NOTIFICACAO_ROUTES),
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMIN', 'CONSUL', 'OFFICER'] },
   },
   {
     path: 'unauthorized',

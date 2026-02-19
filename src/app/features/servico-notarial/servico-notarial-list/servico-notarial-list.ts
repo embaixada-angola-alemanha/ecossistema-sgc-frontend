@@ -20,6 +20,7 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ServicoNotarialService } from '../../../core/services/servico-notarial.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { CitizenContextService } from '../../../core/services/citizen-context.service';
 import {
   ServicoNotarial, EstadoServicoNotarial, TipoServicoNotarial,
   TIPO_SERVICO_NOTARIAL_VALUES, ESTADO_SERVICO_NOTARIAL_VALUES, SERVICO_NOTARIAL_TRANSITIONS,
@@ -47,6 +48,7 @@ import { ConfirmDialog, ConfirmDialogData } from '../../../shared/components/con
 export class ServicoNotarialList implements OnInit {
   private readonly servicoService = inject(ServicoNotarialService);
   private readonly authService = inject(AuthService);
+  private readonly citizenContext = inject(CitizenContextService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly translate = inject(TranslateService);
@@ -69,7 +71,7 @@ export class ServicoNotarialList implements OnInit {
 
   private readonly searchSubject = new Subject<string>();
 
-  readonly canCreate = this.authService.hasAnyRole('ADMIN', 'CONSUL', 'OFFICER');
+  readonly canCreate = this.authService.hasAnyRole('ADMIN', 'CONSUL', 'OFFICER', 'CITIZEN');
   readonly canEdit = this.authService.hasAnyRole('ADMIN', 'CONSUL', 'OFFICER');
   readonly canChangeStatus = this.authService.hasAnyRole('ADMIN', 'CONSUL');
   readonly canDelete = this.authService.isAdmin();
@@ -156,10 +158,11 @@ export class ServicoNotarialList implements OnInit {
 
   private loadData(): void {
     this.loading.set(true);
+    const cidadaoId = this.citizenContext.cidadaoId() ?? undefined;
     this.servicoService.getAll(
       this.page,
       this.pageSize,
-      undefined,
+      cidadaoId,
       this.estadoFilter || undefined,
       this.tipoFilter || undefined,
     ).subscribe({
