@@ -37,6 +37,9 @@ interface DialogData {
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>{{ 'cidadao.numeroPassaporte' | translate }}</mat-label>
             <input matInput formControlName="numeroPassaporte">
+            @if (form.get('numeroPassaporte')?.hasError('required')) {
+              <mat-error>{{ 'validation.required' | translate }}</mat-error>
+            }
             @if (form.get('numeroPassaporte')?.hasError('pattern')) {
               <mat-error>{{ 'cidadao.errors.passaporteFormat' | translate }}</mat-error>
             }
@@ -46,6 +49,9 @@ interface DialogData {
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>{{ 'cidadao.nomeCompleto' | translate }}</mat-label>
           <input matInput formControlName="nomeCompleto">
+          @if (form.get('nomeCompleto')?.hasError('required')) {
+            <mat-error>{{ 'validation.required' | translate }}</mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
@@ -83,11 +89,17 @@ interface DialogData {
         <mat-form-field appearance="outline">
           <mat-label>{{ 'cidadao.email' | translate }}</mat-label>
           <input matInput formControlName="email" type="email">
+          @if (form.get('email')?.hasError('email')) {
+            <mat-error>{{ 'validation.email' | translate }}</mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
           <mat-label>{{ 'cidadao.telefone' | translate }}</mat-label>
           <input matInput formControlName="telefone">
+          @if (form.get('telefone')?.hasError('pattern')) {
+            <mat-error>{{ 'validation.phone' | translate }}</mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">

@@ -1,6 +1,6 @@
 <div class="user-admin-page">
   <div class="page-header">
-    <h2>{{ 'userAdmin.title' | translate }}</h2>
+    <h1 class="page-title">{{ 'userAdmin.title' | translate }}</h1>
     @if (canManage) {
       <button mat-flat-button color="primary" (click)="openCreate()">
         <mat-icon>person_add</mat-icon>
@@ -109,7 +109,8 @@
             <th mat-header-cell *matHeaderCellDef></th>
             <td mat-cell *matCellDef="let user">
               @if (canManage) {
-                <button mat-icon-button [matMenuTriggerFor]="actionMenu">
+                <button mat-icon-button [matMenuTriggerFor]="actionMenu"
+                        [attr.aria-label]="'Actions for ' + user.username">
                   <mat-icon>more_vert</mat-icon>
                 </button>
                 <mat-menu #actionMenu="matMenu">
@@ -137,7 +138,9 @@
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns" class="clickable-row" (click)="openDetail(row)"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns" class="clickable-row"
+              tabindex="0" role="link" [attr.aria-label]="'View details for ' + row.username"
+              (click)="openDetail(row)" (keydown.enter)="openDetail(row)"></tr>
         </table>
 
         <mat-paginator

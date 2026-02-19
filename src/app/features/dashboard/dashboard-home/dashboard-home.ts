@@ -57,12 +57,14 @@ export class DashboardHome implements OnInit {
     this.error.set(null);
 
     const today = new Date().toISOString().split('T')[0];
+    const todayStart = `${today}T00:00:00`;
+    const todayEnd = `${today}T23:59:59`;
 
     forkJoin({
       dashboard: this.relatorioService.getDashboard(),
       cidadaos: this.cidadaoService.getAll(0, 1),
       recentVisas: this.vistoService.getAll(0, 5),
-      todayAppointments: this.agendamentoService.getAll(0, 5, undefined, undefined, undefined, today, today),
+      todayAppointments: this.agendamentoService.getAll(0, 5, undefined, undefined, undefined, todayStart, todayEnd),
       upcomingAppointments: this.agendamentoService.getAll(0, 5, undefined, 'PENDENTE'),
     }).subscribe({
       next: ({ dashboard, cidadaos, recentVisas, todayAppointments, upcomingAppointments }) => {

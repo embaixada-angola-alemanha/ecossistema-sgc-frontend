@@ -62,6 +62,7 @@
   "validation.required": "Required field",
   "validation.email": "Invalid email",
   "validation.minLength": "Minimum {{min}} characters",
+  "validation.phone": "Invalid phone number format",
 
   "auth.logout": "Logout",
   "auth.profile": "Profile",

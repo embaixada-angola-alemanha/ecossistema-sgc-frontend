@@ -9,15 +9,16 @@
   --gold-dim: rgba(201, 168, 76, 0.12);
   --red: #cc092f;
   --green: #4d9a5c;
-  --text: #e8e4dc;
-  --text-dim: rgba(232, 228, 220, 0.65);
-  --border: rgba(201, 168, 76, 0.1);
+  --text: #f0ece4;
+  --text-dim: rgba(240, 236, 228, 0.78);
+  --border: rgba(201, 168, 76, 0.15);
 }
 
 html {
   height: 100%;
   @include mat.theme((
     color: (
+      theme-type: dark,
       primary: mat.$yellow-palette,
       tertiary: mat.$orange-palette,
     ),
@@ -31,6 +32,8 @@ body {
   background-color: var(--bg);
   color: var(--text);
   font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
   margin: 0;
   height: 100%;
 }
@@ -99,9 +102,173 @@ body {
   stroke: var(--gold) !important;
 }
 
-// Table responsive horizontal scroll
+// Table responsive horizontal scroll + readability
 .mat-mdc-table {
   min-width: 600px;
+
+  .mat-mdc-header-cell {
+    color: var(--text) !important;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .mat-mdc-cell {
+    color: var(--text) !important;
+    font-size: 0.9rem;
+  }
+
+  .mat-mdc-row:hover {
+    background: var(--gold-dim) !important;
+  }
+}
+
+// Form field readability
+.mat-mdc-form-field {
+  .mdc-text-field--outlined .mdc-notched-outline__leading,
+  .mdc-text-field--outlined .mdc-notched-outline__notch,
+  .mdc-text-field--outlined .mdc-notched-outline__trailing {
+    border-color: rgba(240, 236, 228, 0.25) !important;
+  }
+}
+
+.mat-mdc-input-element,
+.mat-mdc-select-value {
+  color: var(--text) !important;
+}
+
+.mat-mdc-floating-label {
+  color: var(--text-dim) !important;
+}
+
+// Paginator readability
+.mat-mdc-paginator {
+  color: var(--text) !important;
+  background: transparent !important;
+}
+
+// Snackbar readability
+.mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  background: var(--surface2) !important;
+  border: 1px solid var(--border);
+}
+
+.mat-mdc-snack-bar-label {
+  color: var(--text) !important;
+}
+
+// Force dark surfaces on ALL Material components
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+}
+
+.mat-mdc-dialog-title {
+  color: var(--text) !important;
+}
+
+.mat-mdc-dialog-content {
+  color: var(--text) !important;
+}
+
+.mat-mdc-tab-header {
+  background: var(--surface) !important;
+}
+
+.mat-mdc-tab:not(.mdc-tab--active) .mdc-tab__text-label {
+  color: var(--text-dim) !important;
+}
+
+.mdc-tab--active .mdc-tab__text-label {
+  color: var(--gold) !important;
+}
+
+.mat-mdc-tab-body-wrapper {
+  background: var(--surface) !important;
+}
+
+.mat-step-header {
+  background: transparent !important;
+  color: var(--text) !important;
+}
+
+.mat-mdc-chip {
+  background: var(--surface2) !important;
+  color: var(--text) !important;
+}
+
+.mat-mdc-select-panel {
+  background: var(--surface) !important;
+}
+
+.mat-mdc-option {
+  color: var(--text) !important;
+
+  &:hover {
+    background: var(--gold-dim) !important;
+  }
+
+  &.mdc-list-item--selected {
+    background: var(--gold-dim) !important;
+    color: var(--gold) !important;
+  }
+}
+
+.mat-mdc-autocomplete-panel {
+  background: var(--surface) !important;
+}
+
+.mat-datepicker-content {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+}
+
+.mat-calendar-body-cell-content {
+  color: var(--text) !important;
+}
+
+.mat-calendar-body-selected {
+  background: var(--gold) !important;
+  color: var(--bg) !important;
+}
+
+.mat-calendar-body-today:not(.mat-calendar-body-selected) {
+  border-color: var(--gold) !important;
+}
+
+.mat-calendar-table-header th {
+  color: var(--text-dim) !important;
+}
+
+.mat-calendar-arrow {
+  fill: var(--text) !important;
+}
+
+.mat-mdc-button-toggle-group {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+}
+
+.mat-mdc-button-toggle {
+  color: var(--text-dim) !important;
+  background: transparent !important;
+
+  &.mat-button-toggle-checked {
+    background: var(--gold-dim) !important;
+    color: var(--gold) !important;
+  }
+}
+
+// Screen-reader-only utility (WCAG 2.1 AA)
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 // Scrollbar styling

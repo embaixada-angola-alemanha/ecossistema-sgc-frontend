@@ -1,6 +1,6 @@
 <div class="documento-page">
   <div class="page-header">
-    <h2>{{ 'documento.title' | translate }}</h2>
+    <h1 class="page-title">{{ 'documento.title' | translate }}</h1>
     @if (canCreate && cidadaoId) {
       <button mat-raised-button color="primary" (click)="openUpload()">
         <mat-icon>upload_file</mat-icon>
@@ -88,7 +88,8 @@
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef>{{ 'common.actions' | translate }}</th>
           <td mat-cell *matCellDef="let row">
-            <button mat-icon-button [matMenuTriggerFor]="rowMenu" (click)="$event.stopPropagation()">
+            <button mat-icon-button [matMenuTriggerFor]="rowMenu" (click)="$event.stopPropagation()"
+                    [attr.aria-label]="'Actions for document ' + (row.numero || row.ficheiroNome || row.tipo)">
               <mat-icon>more_vert</mat-icon>
             </button>
             <mat-menu #rowMenu="matMenu">
@@ -123,7 +124,9 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="clickable-row" (click)="openDetail(row)"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="clickable-row"
+            tabindex="0" role="link" [attr.aria-label]="'View details for ' + ('documento.tipo.' + row.tipo | translate)"
+            (click)="openDetail(row)" (keydown.enter)="openDetail(row)"></tr>
       </table>
 
       @if (documentos().length === 0) {

@@ -62,6 +62,7 @@
   "validation.required": "Pflichtfeld",
   "validation.email": "Ungueltige E-Mail",
   "validation.minLength": "Mindestens {{min}} Zeichen",
+  "validation.phone": "Ungueltiges Telefonnummernformat",
 
   "auth.logout": "Abmelden",
   "auth.profile": "Profil",

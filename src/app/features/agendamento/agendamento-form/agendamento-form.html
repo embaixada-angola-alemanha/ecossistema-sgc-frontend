@@ -1,9 +1,9 @@
 <div class="agendamento-form-page">
   <div class="page-header">
-    <button mat-icon-button (click)="goBack()">
+    <button mat-icon-button (click)="goBack()" aria-label="Go back">
       <mat-icon>arrow_back</mat-icon>
     </button>
-    <h2>{{ (isEdit() ? 'agendamento.reschedule' : 'agendamento.new') | translate }}</h2>
+    <h1 class="page-title">{{ (isEdit() ? 'agendamento.reschedule' : 'agendamento.new') | translate }}</h1>
   </div>
 
   @if (loading()) {
@@ -15,22 +15,28 @@
           @if (!isEdit()) {
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>{{ 'agendamento.cidadaoNome' | translate }}</mat-label>
-              <mat-select [(ngModel)]="cidadaoId" required>
+              <mat-select [(ngModel)]="cidadaoId" #cidadaoIdCtrl="ngModel" required>
                 @for (c of cidadaos(); track c.id) {
                   <mat-option [value]="c.id">{{ c.nomeCompleto }} ({{ c.numeroPassaporte }})</mat-option>
                 }
               </mat-select>
               <mat-icon matPrefix>person</mat-icon>
+              @if (cidadaoIdCtrl.hasError('required')) {
+                <mat-error>{{ 'validation.required' | translate }}</mat-error>
+              }
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>{{ 'common.type' | translate }}</mat-label>
-              <mat-select [(ngModel)]="tipo" (selectionChange)="onTipoChange()" required>
+              <mat-select [(ngModel)]="tipo" #tipoCtrl="ngModel" (selectionChange)="onTipoChange()" required>
                 @for (t of tipoValues; track t) {
                   <mat-option [value]="t">{{ 'agendamento.tipo.' + t | translate }}</mat-option>
                 }
               </mat-select>
               <mat-icon matPrefix>category</mat-icon>
+              @if (tipoCtrl.hasError('required')) {
+                <mat-error>{{ 'validation.required' | translate }}</mat-error>
+              }
             </mat-form-field>
           }
 

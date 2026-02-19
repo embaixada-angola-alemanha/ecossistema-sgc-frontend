@@ -1,6 +1,6 @@
 <div class="relatorio-page">
   <div class="page-header">
-    <h2>{{ 'module.relatorios' | translate }}</h2>
+    <h1 class="page-title">{{ 'module.relatorios' | translate }}</h1>
     <div class="header-actions">
       <button mat-stroked-button [matMenuTriggerFor]="exportMenu">
         <mat-icon>download</mat-icon>
@@ -40,7 +40,7 @@
           <mat-icon>filter_list</mat-icon>
           {{ 'relatorio.filter' | translate }}
         </button>
-        <button mat-button (click)="clearFilter()">
+        <button mat-button (click)="clearFilter()" aria-label="Clear filters">
           <mat-icon>clear</mat-icon>
         </button>
       </div>

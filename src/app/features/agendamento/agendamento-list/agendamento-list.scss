@@ -52,9 +52,9 @@
 }
 
 .calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 1px;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 1px;
   background: var(--border, rgba(201, 168, 76, 0.1));
   border: 1px solid var(--border, rgba(201, 168, 76, 0.1));
   border-radius: 8px;
@@ -77,8 +77,15 @@
   padding: 4px;
   cursor: pointer;
   transition: background 0.15s;
+  vertical-align: top;
 
   &:hover {
+    background: var(--gold-dim, rgba(201, 168, 76, 0.12));
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--gold, #c9a84c);
+    outline-offset: -2px;
     background: var(--gold-dim, rgba(201, 168, 76, 0.12));
   }
 
@@ -117,12 +124,18 @@
   text-overflow: ellipsis;
   cursor: pointer;
 
-  &.status-PENDENTE { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
-  &.status-CONFIRMADO { background: rgba(77, 154, 92, 0.2); color: #4d9a5c; }
-  &.status-REAGENDADO { background: rgba(33, 150, 243, 0.2); color: #2196f3; }
-  &.status-CANCELADO { background: rgba(204, 9, 47, 0.2); color: #cc092f; }
-  &.status-COMPLETADO { background: rgba(77, 154, 92, 0.3); color: #81c784; }
-  &.status-NAO_COMPARECEU { background: rgba(255, 152, 0, 0.2); color: #ff9800; }
+  &:focus-visible {
+    outline: 2px solid var(--gold-light, #e8d08e);
+    outline-offset: 1px;
+  }
+
+  // WCAG 2.1 AA contrast-safe colors against dark surface (#141821)
+  &.status-PENDENTE { background: rgba(255, 213, 79, 0.2); color: #ffd54f; }
+  &.status-CONFIRMADO { background: rgba(129, 199, 132, 0.2); color: #81c784; }
+  &.status-REAGENDADO { background: rgba(100, 181, 246, 0.2); color: #64b5f6; }
+  &.status-CANCELADO { background: rgba(239, 83, 80, 0.2); color: #ef5350; }
+  &.status-COMPLETADO { background: rgba(129, 199, 132, 0.3); color: #a5d6a7; }
+  &.status-NAO_COMPARECEU { background: rgba(255, 183, 77, 0.2); color: #ffb74d; }
 }
 
 .day-more {

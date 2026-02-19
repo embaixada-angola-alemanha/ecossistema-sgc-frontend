@@ -32,11 +32,14 @@ import { switchMap } from 'rxjs/operators';
       <div class="upload-form">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>{{ 'common.type' | translate }}</mat-label>
-          <mat-select [(ngModel)]="tipo" required>
+          <mat-select [(ngModel)]="tipo" #tipoCtrl="ngModel" required>
             @for (t of tipoValues; track t) {
               <mat-option [value]="t">{{ 'documento.tipo.' + t | translate }}</mat-option>
             }
           </mat-select>
+          @if (tipoCtrl.hasError('required')) {
+            <mat-error>{{ 'validation.required' | translate }}</mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field appearance="outline">

@@ -1,6 +1,6 @@
 <div class="visto-page">
   <div class="page-header">
-    <h2>{{ 'visto.title' | translate }}</h2>
+    <h1 class="page-title">{{ 'visto.title' | translate }}</h1>
     @if (canCreate) {
       <button mat-raised-button color="primary" (click)="openCreate()">
         <mat-icon>add</mat-icon>
@@ -113,7 +113,9 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="clickable-row" (click)="openDetail(row)"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="clickable-row"
+            tabindex="0" role="link" [attr.aria-label]="'View details for ' + (row.cidadaoNome || row.numeroVisto)"
+            (click)="openDetail(row)" (keydown.enter)="openDetail(row)"></tr>
       </table>
 
       @if (vistos().length === 0) {

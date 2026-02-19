@@ -3,10 +3,10 @@
 } @else {
   <div class="form-page">
     <div class="page-header">
-      <button mat-icon-button (click)="goBack()">
+      <button mat-icon-button (click)="goBack()" aria-label="Go back">
         <mat-icon>arrow_back</mat-icon>
       </button>
-      <h2>{{ (isEdit ? 'registoCivil.editRegisto' : 'registoCivil.newRegisto') | translate }}</h2>
+      <h1 class="page-title">{{ (isEdit ? 'registoCivil.editRegisto' : 'registoCivil.newRegisto') | translate }}</h1>
     </div>
 
     <mat-stepper linear #stepper>
@@ -21,6 +21,9 @@
                 <mat-option [value]="c.id">{{ c.nomeCompleto }} ({{ c.numeroPassaporte }})</mat-option>
               }
             </mat-select>
+            @if (cidadaoForm.get('cidadaoId')?.hasError('required')) {
+              <mat-error>{{ 'validation.required' | translate }}</mat-error>
+            }
           </mat-form-field>
 
           @if (selectedCidadao()) {
@@ -57,6 +60,9 @@
                 <mat-option [value]="tipo">{{ 'registoCivil.tipo.' + tipo | translate }}</mat-option>
               }
             </mat-select>
+            @if (tipoForm.get('tipo')?.hasError('required')) {
+              <mat-error>{{ 'validation.required' | translate }}</mat-error>
+            }
           </mat-form-field>
 
           <div [formGroup]="eventForm" class="form-row">

@@ -1,6 +1,6 @@
 <div class="servico-notarial-page">
   <div class="page-header">
-    <h2>{{ 'servicoNotarial.title' | translate }}</h2>
+    <h1 class="page-title">{{ 'servicoNotarial.title' | translate }}</h1>
     @if (canCreate) {
       <button mat-raised-button color="primary" (click)="openCreate()">
         <mat-icon>add</mat-icon>
@@ -84,7 +84,8 @@
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef>{{ 'common.actions' | translate }}</th>
           <td mat-cell *matCellDef="let row">
-            <button mat-icon-button [matMenuTriggerFor]="rowMenu" (click)="$event.stopPropagation()">
+            <button mat-icon-button [matMenuTriggerFor]="rowMenu" (click)="$event.stopPropagation()"
+                    [attr.aria-label]="'Actions for ' + row.cidadaoNome">
               <mat-icon>more_vert</mat-icon>
             </button>
             <mat-menu #rowMenu="matMenu">
@@ -117,7 +118,9 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="clickable-row" (click)="openDetail(row)"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="clickable-row"
+            tabindex="0" role="link" [attr.aria-label]="'View details for ' + row.cidadaoNome"
+            (click)="openDetail(row)" (keydown.enter)="openDetail(row)"></tr>
       </table>
 
       @if (servicos().length === 0) {

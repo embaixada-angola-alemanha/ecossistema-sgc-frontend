@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, DestroyRef } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, DestroyRef, ElementRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -62,12 +62,23 @@ export class AgendamentoList implements OnInit {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly translate = inject(TranslateService);
+  private readonly elementRef = inject(ElementRef);
 
   readonly loading = signal(true);
   readonly agendamentos = signal<Agendamento[]>([]);
   readonly totalElements = signal(0);
   readonly calendarDays = signal<CalendarDay[]>([]);
   readonly currentMonthLabel = signal('');
+
+  /** Group flat calendarDays into rows of 7 for the table layout */
+  readonly calendarWeeks = computed<CalendarDay[][]>(() => {
+    const days = this.calendarDays();
+    const weeks: CalendarDay[][] = [];
+    for (let i = 0; i < days.length; i += 7) {
+      weeks.push(days.slice(i, i + 7));
+    }
+    return weeks;
+  });
 
   readonly displayedColumns = ['cidadaoNome', 'numeroAgendamento', 'tipo', 'dataHora', 'estado', 'actions'];
   readonly tipoValues = TIPO_AGENDAMENTO_VALUES;
@@ -178,6 +189,67 @@ export class AgendamentoList implements OnInit {
         error: () => this.snackBar.open(this.translate.instant('common.error.deleteFailed'), '', { duration: 3000 }),
       });
     });
+  }
+
+  /** Handle Enter/Space on a calendar day cell - open first event or do nothing */
+  onDayActivate(day: CalendarDay): void {
+    if (day.events.length > 0) {
+      this.openDetail(day.events[0]);
+    }
+  }
+
+  /** Arrow key navigation within the calendar grid */
+  onCalendarDayKeydown(event: KeyboardEvent, currentDay: CalendarDay): void {
+    const days = this.calendarDays();
+    const currentIndex = days.findIndex(d => d.date.getTime() === currentDay.date.getTime());
+    if (currentIndex === -1) return;
+
+    let targetIndex = -1;
+
+    switch (event.key) {
+      case 'ArrowRight':
+        targetIndex = currentIndex + 1;
+        break;
+      case 'ArrowLeft':
+        targetIndex = currentIndex - 1;
+        break;
+      case 'ArrowDown':
+        targetIndex = currentIndex + 7;
+        break;
+      case 'ArrowUp':
+        targetIndex = currentIndex - 7;
+        break;
+      case 'Home':
+        // Move to start of the week row
+        targetIndex = currentIndex - (currentIndex % 7);
+        break;
+      case 'End':
+        // Move to end of the week row
+        targetIndex = currentIndex - (currentIndex % 7) + 6;
+        break;
+      default:
+        return; // Don't prevent default for non-navigation keys
+    }
+
+    event.preventDefault();
+
+    if (targetIndex >= 0 && targetIndex < days.length) {
+      this.focusCalendarDay(targetIndex);
+    } else if (targetIndex < 0) {
+      // Navigate to previous month
+      this.prevMonth();
+    } else if (targetIndex >= days.length) {
+      // Navigate to next month
+      this.nextMonth();
+    }
+  }
+
+  /** Focus a specific calendar day cell by index */
+  private focusCalendarDay(index: number): void {
+    const gridCells = this.elementRef.nativeElement.querySelectorAll('td.calendar-day');
+    if (gridCells[index]) {
+      (gridCells[index] as HTMLElement).focus();
+    }
   }
 
   prevMonth(): void {

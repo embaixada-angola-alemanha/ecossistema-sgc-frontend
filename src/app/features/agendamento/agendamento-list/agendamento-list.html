@@ -1,12 +1,12 @@
 <div class="agendamento-page">
   <div class="page-header">
-    <h2>{{ 'module.agendamentos' | translate }}</h2>
+    <h1 class="page-title">{{ 'module.agendamentos' | translate }}</h1>
     <div class="header-actions">
-      <mat-button-toggle-group [(ngModel)]="viewMode" (change)="onViewChange()">
-        <mat-button-toggle value="calendar" matTooltip="Calendario">
+      <mat-button-toggle-group [(ngModel)]="viewMode" (change)="onViewChange()" aria-label="View mode">
+        <mat-button-toggle value="calendar" matTooltip="Calendario" aria-label="Calendar view">
           <mat-icon>calendar_month</mat-icon>
         </mat-button-toggle>
-        <mat-button-toggle value="table" matTooltip="Tabela">
+        <mat-button-toggle value="table" matTooltip="Tabela" aria-label="Table view">
           <mat-icon>table_rows</mat-icon>
         </mat-button-toggle>
       </mat-button-toggle-group>
@@ -52,40 +52,60 @@
       <mat-card class="calendar-card">
         <div class="calendar-header">
           <div class="calendar-nav">
-            <button mat-icon-button (click)="prevMonth()"><mat-icon>chevron_left</mat-icon></button>
+            <button mat-icon-button (click)="prevMonth()" aria-label="Previous month"><mat-icon>chevron_left</mat-icon></button>
           </div>
-          <h3>{{ currentMonthLabel() }}</h3>
+          <h3 aria-live="polite">{{ currentMonthLabel() }}</h3>
           <div class="calendar-nav">
             <button mat-stroked-button (click)="goToToday()">{{ 'common.today' | translate }}</button>
-            <button mat-icon-button (click)="nextMonth()"><mat-icon>chevron_right</mat-icon></button>
+            <button mat-icon-button (click)="nextMonth()" aria-label="Next month"><mat-icon>chevron_right</mat-icon></button>
           </div>
         </div>
 
-        <div class="calendar-grid">
-          @for (day of weekDays; track day) {
-            <div class="calendar-day-header">{{ day }}</div>
-          }
-          @for (day of calendarDays(); track day.date.getTime()) {
-            <div class="calendar-day"
-                 [class.other-month]="!day.isCurrentMonth"
-                 [class.today]="day.isToday"
-                 [class.weekend]="day.isWeekend">
-              <div class="day-number">{{ day.date.getDate() }}</div>
-              <div class="day-events">
-                @for (event of day.events.slice(0, 3); track event.id) {
-                  <div class="day-event status-{{ event.estado }}"
-                       (click)="openDetail(event); $event.stopPropagation()"
-                       [matTooltip]="event.cidadaoNome + ' - ' + event.tipo">
-                    {{ event.dataHora | date:'HH:mm' }} {{ event.cidadaoNome.split(' ')[0] }}
-                  </div>
+        <table class="calendar-grid" role="grid" [attr.aria-label]="currentMonthLabel()">
+          <thead>
+            <tr role="row">
+              @for (day of weekDays; track day) {
+                <th class="calendar-day-header" role="columnheader" scope="col">{{ day }}</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (week of calendarWeeks(); track $index) {
+              <tr role="row">
+                @for (day of week; track day.date.getTime()) {
+                  <td class="calendar-day" role="gridcell"
+                      [class.other-month]="!day.isCurrentMonth"
+                      [class.today]="day.isToday"
+                      [class.weekend]="day.isWeekend"
+                      tabindex="0"
+                      [attr.aria-label]="day.date | date:'EEEE, d MMMM yyyy'"
+                      (keydown)="onCalendarDayKeydown($event, day)"
+                      (keydown.enter)="onDayActivate(day); $event.preventDefault()"
+                      (keydown.space)="onDayActivate(day); $event.preventDefault()">
+                    <div class="day-number">{{ day.date.getDate() }}</div>
+                    <div class="day-events">
+                      @for (event of day.events.slice(0, 3); track event.id) {
+                        <div class="day-event status-{{ event.estado }}"
+                             tabindex="0"
+                             role="button"
+                             [attr.aria-label]="event.cidadaoNome + ' - ' + event.tipo + ' ' + (event.dataHora | date:'HH:mm')"
+                             (click)="openDetail(event); $event.stopPropagation()"
+                             (keydown.enter)="openDetail(event); $event.stopPropagation(); $event.preventDefault()"
+                             (keydown.space)="openDetail(event); $event.stopPropagation(); $event.preventDefault()"
+                             [matTooltip]="event.cidadaoNome + ' - ' + event.tipo">
+                          {{ event.dataHora | date:'HH:mm' }} {{ event.cidadaoNome.split(' ')[0] }}
+                        </div>
+                      }
+                      @if (day.events.length > 3) {
+                        <div class="day-more">+{{ day.events.length - 3 }} {{ 'common.more' | translate }}</div>
+                      }
+                    </div>
+                  </td>
                 }
-                @if (day.events.length > 3) {
-                  <div class="day-more">+{{ day.events.length - 3 }} {{ 'common.more' | translate }}</div>
-                }
-              </div>
-            </div>
-          }
-        </div>
+              </tr>
+            }
+          </tbody>
+        </table>
       </mat-card>
     } @else {
       <mat-card class="table-card">
@@ -118,7 +138,8 @@
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>{{ 'common.actions' | translate }}</th>
             <td mat-cell *matCellDef="let row">
-              <button mat-icon-button [matMenuTriggerFor]="rowMenu" (click)="$event.stopPropagation()">
+              <button mat-icon-button [matMenuTriggerFor]="rowMenu" (click)="$event.stopPropagation()"
+                      [attr.aria-label]="'Actions for ' + row.cidadaoNome">
                 <mat-icon>more_vert</mat-icon>
               </button>
               <mat-menu #rowMenu="matMenu">
@@ -151,7 +172,9 @@
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="clickable-row" (click)="openDetail(row)"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="clickable-row"
+              tabindex="0" role="link" [attr.aria-label]="'View details for ' + row.cidadaoNome"
+              (click)="openDetail(row)" (keydown.enter)="openDetail(row)"></tr>
         </table>
 
         @if (agendamentos().length === 0) {

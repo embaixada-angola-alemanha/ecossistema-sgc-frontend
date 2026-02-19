@@ -62,6 +62,7 @@
   "validation.required": "Campo obrigatorio",
   "validation.email": "Email invalido",
   "validation.minLength": "Minimo {{min}} caracteres",
+  "validation.phone": "Formato de telefone invalido",
 
   "auth.logout": "Sair",
   "auth.profile": "Perfil",

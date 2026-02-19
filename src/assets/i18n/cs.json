@@ -62,6 +62,7 @@
   "validation.required": "Kampu obrigatoriu",
   "validation.email": "Email invalidu",
   "validation.minLength": "Minimu {{min}} karaktiris",
+  "validation.phone": "Formatu di telefoni invalidu",
 
   "auth.logout": "Sai",
   "auth.profile": "Perfil",

@@ -17,8 +17,8 @@
           <div class="nav-label" aria-hidden="true">{{ section.label }}</div>
           @for (item of section.items; track item.route) {
             @if (isVisible(item)) {
-              <a class="nav-item" [routerLink]="item.route" routerLinkActive="active"
-                 [attr.aria-label]="item.labelKey | translate" [attr.aria-current]="null">
+              <a class="nav-item" [routerLink]="item.route" routerLinkActive="active" #rla="routerLinkActive"
+                 [attr.aria-label]="item.labelKey | translate" [attr.aria-current]="rla.isActive ? 'page' : null">
                 <div class="nav-icon" aria-hidden="true">
                   <mat-icon>{{ item.icon }}</mat-icon>
                 </div>
@@ -88,5 +88,8 @@
     <main id="main-content" class="page-content" role="main">
       <router-outlet />
     </main>
+
+    <!-- Aria-live region for screen reader announcements -->
+    <div aria-live="polite" class="sr-only" id="announcer"></div>
   </mat-sidenav-content>
 </mat-sidenav-container>
