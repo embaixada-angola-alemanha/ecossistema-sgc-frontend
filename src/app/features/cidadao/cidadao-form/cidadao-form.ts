@@ -114,7 +114,7 @@ interface DialogData {
       grid-template-columns: 1fr 1fr;
       gap: 8px 16px;
       padding: 8px 0;
-      min-width: 500px;
+      min-width: min(500px, 90vw);
     }
     .full-width { grid-column: 1 / -1; }
     mat-dialog-content { max-height: 70vh; }

@@ -13,7 +13,7 @@ import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { CidadaoService } from '../../../core/services/cidadao.service';
@@ -23,6 +23,7 @@ import { LoadingSpinner } from '../../../shared/components/loading-spinner/loadi
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { CidadaoFormDialog } from '../cidadao-form/cidadao-form';
 import { CidadaoDetailDialog } from '../cidadao-detail/cidadao-detail';
+import { ConfirmDialog, ConfirmDialogData } from '../../../shared/components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'sgc-cidadao-list',
@@ -45,6 +46,7 @@ export class CidadaoList implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translate = inject(TranslateService);
 
   readonly loading = signal(true);
   readonly cidadaos = signal<Cidadao[]>([]);
@@ -100,7 +102,7 @@ export class CidadaoList implements OnInit {
 
   openCreate(): void {
     const ref = this.dialog.open(CidadaoFormDialog, {
-      width: '640px',
+      width: 'min(640px, 95vw)',
       data: {},
     });
     ref.afterClosed().subscribe((result) => {
@@ -110,7 +112,7 @@ export class CidadaoList implements OnInit {
 
   openDetail(cidadao: Cidadao): void {
     const ref = this.dialog.open(CidadaoDetailDialog, {
-      width: '600px',
+      width: 'min(600px, 95vw)',
       data: { cidadaoId: cidadao.id },
     });
     ref.afterClosed().subscribe((result) => {
@@ -120,7 +122,7 @@ export class CidadaoList implements OnInit {
 
   openEdit(cidadao: Cidadao): void {
     const ref = this.dialog.open(CidadaoFormDialog, {
-      width: '640px',
+      width: 'min(640px, 95vw)',
       data: { cidadao },
     });
     ref.afterClosed().subscribe((result) => {
@@ -131,15 +133,25 @@ export class CidadaoList implements OnInit {
   changeEstado(cidadao: Cidadao, estado: EstadoCidadao): void {
     this.cidadaoService.updateEstado(cidadao.id, estado).subscribe({
       next: () => this.loadData(),
-      error: () => this.snackBar.open('Erro ao alterar estado', '', { duration: 3000 }),
+      error: () => this.snackBar.open(this.translate.instant('common.error.statusChange'), '', { duration: 3000 }),
     });
   }
 
   deleteCidadao(cidadao: Cidadao): void {
-    if (!confirm(`Eliminar ${cidadao.nomeCompleto}?`)) return;
-    this.cidadaoService.delete(cidadao.id).subscribe({
-      next: () => this.loadData(),
-      error: () => this.snackBar.open('Erro ao eliminar', '', { duration: 3000 }),
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      width: 'min(400px, 90vw)',
+      data: {
+        title: this.translate.instant('common.confirm.title'),
+        message: this.translate.instant('common.confirm.delete', { name: cidadao.nomeCompleto }),
+        warn: true,
+      } as ConfirmDialogData,
+    });
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.cidadaoService.delete(cidadao.id).subscribe({
+        next: () => this.loadData(),
+        error: () => this.snackBar.open(this.translate.instant('common.error.deleteFailed'), '', { duration: 3000 }),
+      });
     });
   }
 
@@ -159,7 +171,7 @@ export class CidadaoList implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.snackBar.open('Erro ao carregar cidadaos', '', { duration: 3000 });
+        this.snackBar.open(this.translate.instant('common.error.loadFailed'), '', { duration: 3000 });
       },
     });
   }

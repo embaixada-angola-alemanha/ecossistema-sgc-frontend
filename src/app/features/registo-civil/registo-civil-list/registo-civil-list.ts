@@ -14,7 +14,7 @@ import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DatePipe } from '@angular/common';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -27,6 +27,7 @@ import {
 import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { RegistoCivilDetailDialog } from '../registo-civil-detail/registo-civil-detail';
+import { ConfirmDialog, ConfirmDialogData } from '../../../shared/components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'sgc-registo-civil-list',
@@ -48,6 +49,7 @@ export class RegistoCivilList implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -135,10 +137,20 @@ export class RegistoCivilList implements OnInit {
   }
 
   deleteRegisto(registo: RegistoCivil): void {
-    if (!confirm(`Eliminar registo ${registo.numeroRegisto ?? registo.id}?`)) return;
-    this.registoService.delete(registo.id).subscribe({
-      next: () => this.loadData(),
-      error: () => this.snackBar.open('Erro ao eliminar', '', { duration: 3000 }),
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      width: 'min(400px, 90vw)',
+      data: {
+        title: this.translate.instant('common.confirm.title'),
+        message: this.translate.instant('common.confirm.delete', { name: registo.numeroRegisto ?? registo.id }),
+        warn: true,
+      } as ConfirmDialogData,
+    });
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.registoService.delete(registo.id).subscribe({
+        next: () => this.loadData(),
+        error: () => this.snackBar.open('Erro ao eliminar', '', { duration: 3000 }),
+      });
     });
   }
 

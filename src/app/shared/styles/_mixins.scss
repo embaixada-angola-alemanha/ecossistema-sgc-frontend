@@ -1,0 +1,96 @@
+@mixin page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.5rem;
+  }
+}
+
+@mixin filters-card {
+  margin-bottom: 16px;
+
+  .filters-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .search-field {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .filter-field {
+    min-width: 160px;
+  }
+}
+
+@mixin table-card {
+  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  table {
+    width: 100%;
+  }
+
+  .clickable-row {
+    cursor: pointer;
+    &:hover {
+      background: var(--gold-dim);
+    }
+  }
+
+  .name-cell {
+    color: var(--gold);
+    cursor: pointer;
+    font-weight: 500;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .mono {
+    font-family: monospace;
+    font-size: 0.85rem;
+  }
+
+  .delete-action {
+    color: #ef5350 !important;
+  }
+
+  mat-paginator {
+    border-top: 1px solid var(--border);
+  }
+}
+
+@mixin no-data {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-dim);
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 8px 0 0;
+    font-size: 0.95rem;
+  }
+}
+
+@mixin responsive-page {
+  @media (max-width: 768px) {
+    padding: 16px !important;
+  }
+}

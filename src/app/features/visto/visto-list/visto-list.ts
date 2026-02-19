@@ -14,7 +14,7 @@ import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -24,6 +24,7 @@ import { Visto, EstadoVisto, TipoVisto, TIPO_VISTO_VALUES, ESTADO_VISTO_VALUES, 
 import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { VistoDetailDialog } from '../visto-detail/visto-detail';
+import { ConfirmDialog, ConfirmDialogData } from '../../../shared/components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'sgc-visto-list',
@@ -47,6 +48,7 @@ export class VistoList implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translate = inject(TranslateService);
 
   readonly loading = signal(true);
   readonly vistos = signal<Visto[]>([]);
@@ -108,7 +110,7 @@ export class VistoList implements OnInit {
 
   openDetail(visto: Visto): void {
     const ref = this.dialog.open(VistoDetailDialog, {
-      width: '700px',
+      width: 'min(700px, 95vw)',
       data: { vistoId: visto.id },
     });
     ref.afterClosed().subscribe((result) => {
@@ -123,7 +125,7 @@ export class VistoList implements OnInit {
   changeEstado(visto: Visto, estado: EstadoVisto): void {
     this.vistoService.updateEstado(visto.id, estado).subscribe({
       next: () => this.loadData(),
-      error: () => this.snackBar.open('Erro ao alterar estado', '', { duration: 3000 }),
+      error: () => this.snackBar.open(this.translate.instant('common.error.statusChange'), '', { duration: 3000 }),
     });
   }
 
@@ -132,10 +134,20 @@ export class VistoList implements OnInit {
   }
 
   deleteVisto(visto: Visto): void {
-    if (!confirm(`Eliminar visto ${visto.numeroVisto ?? visto.id}?`)) return;
-    this.vistoService.delete(visto.id).subscribe({
-      next: () => this.loadData(),
-      error: () => this.snackBar.open('Erro ao eliminar', '', { duration: 3000 }),
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      width: 'min(400px, 90vw)',
+      data: {
+        title: this.translate.instant('common.confirm.title'),
+        message: this.translate.instant('common.confirm.delete', { name: visto.numeroVisto ?? visto.id }),
+        warn: true,
+      } as ConfirmDialogData,
+    });
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.vistoService.delete(visto.id).subscribe({
+        next: () => this.loadData(),
+        error: () => this.snackBar.open(this.translate.instant('common.error.deleteFailed'), '', { duration: 3000 }),
+      });
     });
   }
 
@@ -155,7 +167,7 @@ export class VistoList implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.snackBar.open('Erro ao carregar vistos', '', { duration: 3000 });
+        this.snackBar.open(this.translate.instant('common.error.loadFailed'), '', { duration: 3000 });
       },
     });
   }

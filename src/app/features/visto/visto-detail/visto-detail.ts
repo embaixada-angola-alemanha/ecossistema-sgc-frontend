@@ -1,19 +1,20 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe, CurrencyPipe } from '@angular/common';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef, MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { VistoService } from '../../../core/services/visto.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Visto, VistoHistorico, EstadoVisto, ALLOWED_TRANSITIONS } from '../../../core/models/visto.model';
 import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
+import { ConfirmDialog, ConfirmDialogData } from '../../../shared/components/confirm-dialog/confirm-dialog';
 
 interface DialogData {
   vistoId: string;
@@ -182,7 +183,7 @@ interface DialogData {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
-      min-width: 550px;
+      min-width: min(550px, 90vw);
     }
     .detail-row {
       display: flex;
@@ -240,8 +241,10 @@ export class VistoDetailDialog implements OnInit {
   private readonly vistoService = inject(VistoService);
   private readonly authService = inject(AuthService);
   private readonly dialogRef = inject(MatDialogRef<VistoDetailDialog>);
+  private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
   private readonly data: DialogData = inject(MAT_DIALOG_DATA);
 
   readonly loading = signal(true);
@@ -285,10 +288,21 @@ export class VistoDetailDialog implements OnInit {
 
   onDelete(): void {
     const v = this.visto();
-    if (!v || !confirm(`Eliminar visto ${v.numeroVisto ?? v.id}?`)) return;
-    this.vistoService.delete(v.id).subscribe({
-      next: () => this.dialogRef.close(true),
-      error: () => this.snackBar.open('Erro ao eliminar', '', { duration: 3000 }),
+    if (!v) return;
+    const confirmRef = this.dialog.open(ConfirmDialog, {
+      width: 'min(400px, 90vw)',
+      data: {
+        title: this.translate.instant('common.confirm.title'),
+        message: this.translate.instant('common.confirm.delete', { name: v.numeroVisto ?? v.id }),
+        warn: true,
+      } as ConfirmDialogData,
+    });
+    confirmRef.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.vistoService.delete(v.id).subscribe({
+        next: () => this.dialogRef.close(true),
+        error: () => this.snackBar.open('Erro ao eliminar', '', { duration: 3000 }),
+      });
     });
   }
 

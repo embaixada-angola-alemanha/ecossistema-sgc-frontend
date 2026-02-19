@@ -14,7 +14,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DatePipe } from '@angular/common';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -29,6 +29,7 @@ import {
 import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
 import { UserAdminDetailDialog } from '../user-admin-detail/user-admin-detail';
 import { UserAdminFormDialog } from '../user-admin-form/user-admin-form';
+import { ConfirmDialog, ConfirmDialogData } from '../../../shared/components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'sgc-user-admin-list',
@@ -50,6 +51,7 @@ export class UserAdminList implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly loading = signal(true);
@@ -144,13 +146,23 @@ export class UserAdminList implements OnInit {
   }
 
   deleteUser(user: UserWithRoles): void {
-    if (!confirm(`Eliminar utilizador ${user.username}?`)) return;
-    this.userService.deleteUser(user.id).subscribe({
-      next: () => {
-        this.loadData();
-        this.snackBar.open('Utilizador eliminado', '', { duration: 3000 });
-      },
-      error: () => this.snackBar.open('Erro ao eliminar', '', { duration: 3000 }),
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      width: 'min(400px, 90vw)',
+      data: {
+        title: this.translate.instant('common.confirm.title'),
+        message: this.translate.instant('common.confirm.delete', { name: user.username }),
+        warn: true,
+      } as ConfirmDialogData,
+    });
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.userService.deleteUser(user.id).subscribe({
+        next: () => {
+          this.loadData();
+          this.snackBar.open('Utilizador eliminado', '', { duration: 3000 });
+        },
+        error: () => this.snackBar.open('Erro ao eliminar', '', { duration: 3000 }),
+      });
     });
   }
 

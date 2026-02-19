@@ -1,13 +1,14 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, ViewChild } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSidenavModule, MatSidenav } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { KeycloakService } from 'keycloak-angular';
+import { BreakpointObserver } from '@angular/cdk/layout';
 
 interface NavItem {
   icon: string;
@@ -37,12 +38,17 @@ interface NavSection {
 export class App implements OnInit {
   private readonly translate = inject(TranslateService);
   private readonly keycloak = inject(KeycloakService);
+  private readonly breakpointObserver = inject(BreakpointObserver);
+
+  @ViewChild('sidenav') sidenav!: MatSidenav;
 
   private static readonly LANG_KEY = 'sgc-lang';
 
   readonly username = signal('');
   readonly userRoles = signal<string[]>([]);
   readonly currentLang = signal('pt');
+  readonly sidenavMode = signal<'side' | 'over'>('side');
+  readonly sidenavOpened = signal(true);
 
   readonly userInitials = computed(() => {
     const name = this.username();
@@ -96,6 +102,20 @@ export class App implements OnInit {
     const tokenParsed = this.keycloak.getKeycloakInstance()?.tokenParsed as Record<string, string> | undefined;
     this.username.set(tokenParsed?.['preferred_username'] ?? 'User');
     this.userRoles.set(this.keycloak.getUserRoles());
+
+    this.breakpointObserver.observe(['(max-width: 768px)']).subscribe(result => {
+      if (result.matches) {
+        this.sidenavMode.set('over');
+        this.sidenavOpened.set(false);
+      } else {
+        this.sidenavMode.set('side');
+        this.sidenavOpened.set(true);
+      }
+    });
+  }
+
+  toggleSidenav(): void {
+    this.sidenav.toggle();
   }
 
   isVisible(item: NavItem): boolean {

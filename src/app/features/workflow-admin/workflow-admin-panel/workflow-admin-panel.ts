@@ -15,8 +15,9 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DatePipe } from '@angular/common';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
@@ -28,6 +29,7 @@ import {
 } from '../../../core/models/workflow.model';
 import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
+import { ConfirmDialog, ConfirmDialogData } from '../../../shared/components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'sgc-workflow-admin-panel',
@@ -49,7 +51,9 @@ import { StatusBadge } from '../../../shared/components/status-badge/status-badg
 export class WorkflowAdminPanel implements OnInit {
   private readonly workflowService = inject(WorkflowService);
   private readonly authService = inject(AuthService);
+  private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly loadingPipeline = signal(true);
@@ -195,23 +199,32 @@ export class WorkflowAdminPanel implements OnInit {
     const ids = Array.from(this.selectedItems());
     if (ids.length === 0) return;
 
-    if (!confirm(`Alterar ${ids.length} item(s) para ${estado}?`)) return;
-
-    this.processingBulk.set(true);
-    this.workflowService.bulkUpdateEstado(this.selectedModule, ids, estado).subscribe({
-      next: (result) => {
-        this.processingBulk.set(false);
-        const msg = result.failed.length > 0
-          ? `${result.success.length} alterado(s), ${result.failed.length} falha(s)`
-          : `${result.success.length} item(s) alterado(s)`;
-        this.snackBar.open(msg, '', { duration: 3000 });
-        this.selectedItems.set(new Set());
-        this.refreshSubject.next();
-      },
-      error: () => {
-        this.processingBulk.set(false);
-        this.snackBar.open('Erro na operação em massa', '', { duration: 3000 });
-      },
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      width: 'min(400px, 90vw)',
+      data: {
+        title: this.translate.instant('common.confirm.title'),
+        message: this.translate.instant('common.confirm.bulkChange', { count: ids.length, estado }),
+        warn: true,
+      } as ConfirmDialogData,
+    });
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.processingBulk.set(true);
+      this.workflowService.bulkUpdateEstado(this.selectedModule, ids, estado).subscribe({
+        next: (result) => {
+          this.processingBulk.set(false);
+          const msg = result.failed.length > 0
+            ? `${result.success.length} alterado(s), ${result.failed.length} falha(s)`
+            : `${result.success.length} item(s) alterado(s)`;
+          this.snackBar.open(msg, '', { duration: 3000 });
+          this.selectedItems.set(new Set());
+          this.refreshSubject.next();
+        },
+        error: () => {
+          this.processingBulk.set(false);
+          this.snackBar.open('Erro na operação em massa', '', { duration: 3000 });
+        },
+      });
     });
   }
 

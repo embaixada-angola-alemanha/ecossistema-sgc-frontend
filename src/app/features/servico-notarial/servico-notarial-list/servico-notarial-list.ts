@@ -14,7 +14,7 @@ import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -27,6 +27,7 @@ import {
 import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { ServicoNotarialDetailDialog } from '../servico-notarial-detail/servico-notarial-detail';
+import { ConfirmDialog, ConfirmDialogData } from '../../../shared/components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'sgc-servico-notarial-list',
@@ -48,6 +49,7 @@ export class ServicoNotarialList implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -135,10 +137,20 @@ export class ServicoNotarialList implements OnInit {
   }
 
   deleteServico(servico: ServicoNotarial): void {
-    if (!confirm(`Eliminar serviço ${servico.numeroServico ?? servico.id}?`)) return;
-    this.servicoService.delete(servico.id).subscribe({
-      next: () => this.loadData(),
-      error: () => this.snackBar.open('Erro ao eliminar', '', { duration: 3000 }),
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      width: 'min(400px, 90vw)',
+      data: {
+        title: this.translate.instant('common.confirm.title'),
+        message: this.translate.instant('common.confirm.delete', { name: servico.numeroServico ?? servico.id }),
+        warn: true,
+      } as ConfirmDialogData,
+    });
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.servicoService.delete(servico.id).subscribe({
+        next: () => this.loadData(),
+        error: () => this.snackBar.open('Erro ao eliminar', '', { duration: 3000 }),
+      });
     });
   }
 

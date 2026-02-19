@@ -1,7 +1,126 @@
-<mat-card>
-  <mat-card-header>
-    <mat-icon mat-card-avatar>dashboard</mat-icon>
-    <mat-card-title>{{ 'module.dashboard' | translate }}</mat-card-title>
-    <mat-card-subtitle>{{ 'common.underConstruction' | translate }}</mat-card-subtitle>
-  </mat-card-header>
-</mat-card>
+@if (loading()) {
+  <sgc-loading-spinner />
+} @else {
+  @if (error()) {
+    <mat-card class="error-card">
+      <mat-card-content>
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ error()! | translate }}</span>
+        <button mat-stroked-button (click)="refresh()">
+          <mat-icon>refresh</mat-icon>
+          {{ 'common.refresh' | translate }}
+        </button>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <div class="kpi-grid">
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <mat-icon class="kpi-icon">people</mat-icon>
+          <div class="kpi-value">{{ totalCitizens() }}</div>
+          <div class="kpi-label">{{ 'dashboard.totalCitizens' | translate }}</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <mat-icon class="kpi-icon">flight_takeoff</mat-icon>
+          <div class="kpi-value">{{ pendingVisas() }}</div>
+          <div class="kpi-label">{{ 'dashboard.pendingVisas' | translate }}</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <mat-icon class="kpi-icon">event</mat-icon>
+          <div class="kpi-value">{{ todayAppointments() }}</div>
+          <div class="kpi-label">{{ 'dashboard.todayAppointments' | translate }}</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <mat-icon class="kpi-icon">description</mat-icon>
+          <div class="kpi-value">{{ pendingDocuments() }}</div>
+          <div class="kpi-label">{{ 'dashboard.pendingDocuments' | translate }}</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="dashboard-grid">
+      <mat-card class="recent-card">
+        <mat-card-header>
+          <mat-card-title>{{ 'dashboard.recentVisas' | translate }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @if (recentVisas().length === 0) {
+            <div class="empty-state">{{ 'dashboard.noRecentVisas' | translate }}</div>
+          } @else {
+            @for (visto of recentVisas(); track visto.id) {
+              <div class="item-row">
+                <div class="item-info">
+                  <span class="item-name">{{ visto.cidadaoNome }}</span>
+                  <span class="item-type">{{ 'visto.tipo.' + visto.tipo | translate }}</span>
+                </div>
+                <div class="item-meta">
+                  <span class="item-status" [attr.data-estado]="visto.estado">
+                    {{ 'visto.estado.' + visto.estado | translate }}
+                  </span>
+                  <span class="item-date">{{ visto.createdAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+              </div>
+            }
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="recent-card">
+        <mat-card-header>
+          <mat-card-title>{{ 'dashboard.upcomingAppointments' | translate }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @if (upcomingAppointments().length === 0) {
+            <div class="empty-state">{{ 'dashboard.noUpcomingAppointments' | translate }}</div>
+          } @else {
+            @for (agendamento of upcomingAppointments(); track agendamento.id) {
+              <div class="item-row">
+                <div class="item-info">
+                  <span class="item-name">{{ agendamento.cidadaoNome }}</span>
+                  <span class="item-type">{{ 'agendamento.tipo.' + agendamento.tipo | translate }}</span>
+                </div>
+                <div class="item-meta">
+                  <span class="item-status" [attr.data-estado]="agendamento.estado">
+                    {{ 'agendamento.estado.' + agendamento.estado | translate }}
+                  </span>
+                  <span class="item-date">{{ agendamento.dataHora | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+              </div>
+            }
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <mat-card class="actions-card">
+      <mat-card-header>
+        <mat-card-title>{{ 'dashboard.quickActions' | translate }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="quick-actions">
+          <button mat-flat-button class="action-btn" (click)="navigateTo('/cidadaos/new')">
+            <mat-icon>person_add</mat-icon>
+            {{ 'dashboard.newCitizen' | translate }}
+          </button>
+          <button mat-flat-button class="action-btn" (click)="navigateTo('/vistos/new')">
+            <mat-icon>flight_takeoff</mat-icon>
+            {{ 'dashboard.newVisa' | translate }}
+          </button>
+          <button mat-flat-button class="action-btn" (click)="navigateTo('/agendamentos/new')">
+            <mat-icon>event</mat-icon>
+            {{ 'dashboard.newAppointment' | translate }}
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+}

@@ -9,7 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { switchMap } from 'rxjs/operators';
@@ -27,7 +27,7 @@ import { LoadingSpinner } from '../../../shared/components/loading-spinner/loadi
   selector: 'sgc-servico-notarial-form',
   standalone: true,
   imports: [
-    ReactiveFormsModule, CurrencyPipe, DatePipe,
+    ReactiveFormsModule, CurrencyPipe,
     MatStepperModule, MatCardModule,
     MatFormFieldModule, MatInputModule, MatSelectModule,
     MatButtonModule, MatIconModule,

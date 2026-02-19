@@ -18,7 +18,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CurrencyPipe, DatePipe } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -58,6 +58,7 @@ export class VistoStepper implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
 
   readonly loading = signal(true);
   readonly saving = signal(false);
@@ -127,7 +128,7 @@ export class VistoStepper implements OnInit {
           this.loading.set(false);
         },
         error: () => {
-          this.snackBar.open('Erro ao carregar visto', '', { duration: 3000 });
+          this.snackBar.open(this.translate.instant('common.error.loadFailed'), '', { duration: 3000 });
           this.router.navigate(['/vistos']);
         },
       });
@@ -205,14 +206,14 @@ export class VistoStepper implements OnInit {
       next: () => {
         this.saving.set(false);
         this.snackBar.open(
-          submit ? 'Visto submetido com sucesso' : 'Rascunho guardado',
+          submit ? this.translate.instant('common.success.submitted') : this.translate.instant('common.success.saved'),
           '', { duration: 3000 },
         );
         this.router.navigate(['/vistos']);
       },
       error: () => {
         this.saving.set(false);
-        this.snackBar.open('Erro ao guardar visto', '', { duration: 3000 });
+        this.snackBar.open(this.translate.instant('common.error.saveFailed'), '', { duration: 3000 });
       },
     });
   }

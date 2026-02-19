@@ -1,17 +1,11 @@
+@use '../../../shared/styles/mixins' as m;
+
 .agendamento-page {
   max-width: 1200px;
 }
 
 .page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-
-  h2 {
-    margin: 0;
-    font-weight: 600;
-  }
+  @include m.page-header;
 
   .header-actions {
     display: flex;
@@ -21,34 +15,17 @@
 }
 
 .filters-card {
-  margin-bottom: 16px;
+  @include m.filters-card;
 }
 
-.filters-row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: flex-start;
-}
-
-.search-field {
-  flex: 2;
-  min-width: 200px;
-}
-
-.filter-field {
-  flex: 1;
-  min-width: 140px;
-}
-
-// View toggle
+// Component-specific: view toggle for calendar/table switch
 .view-toggle {
   display: flex;
   gap: 4px;
   margin-left: 12px;
 }
 
-// Calendar styles
+// Component-specific: calendar styles
 .calendar-card {
   margin-bottom: 16px;
   padding: 16px;
@@ -121,7 +98,7 @@
 .day-number {
   font-size: 12px;
   font-weight: 500;
-  color: var(--text-dim, rgba(232, 228, 220, 0.45));
+  color: var(--text-dim);
   margin-bottom: 4px;
 }
 
@@ -157,59 +134,9 @@
 
 // Table styles
 .table-card {
-  overflow: hidden;
-}
-
-table {
-  width: 100%;
-}
-
-.name-cell {
-  font-weight: 500;
-  cursor: pointer;
-  color: var(--gold, #c9a84c);
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
-.mono {
-  font-family: 'DM Sans', monospace;
-  letter-spacing: 0.05em;
-}
-
-.clickable-row {
-  cursor: pointer;
-
-  &:hover {
-    background: var(--gold-dim, rgba(201, 168, 76, 0.06)) !important;
-  }
+  @include m.table-card;
 }
 
 .no-data {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 48px;
-  color: var(--text-dim, rgba(224, 232, 240, 0.65));
-
-  mat-icon {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
-  }
-}
-
-.delete-action {
-  color: #f44336 !important;
-
-  mat-icon {
-    color: #f44336 !important;
-  }
-}
-
-mat-paginator {
-  border-top: 1px solid var(--border, rgba(201, 168, 76, 0.08));
+  @include m.no-data;
 }

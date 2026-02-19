@@ -10,7 +10,7 @@
   --red: #cc092f;
   --green: #4d9a5c;
   --text: #e8e4dc;
-  --text-dim: rgba(232, 228, 220, 0.45);
+  --text-dim: rgba(232, 228, 220, 0.65);
   --border: rgba(201, 168, 76, 0.1);
 }
 
@@ -97,6 +97,11 @@ body {
 // Override Material progress spinner
 .mat-mdc-progress-spinner circle {
   stroke: var(--gold) !important;
+}
+
+// Table responsive horizontal scroll
+.mat-mdc-table {
+  min-width: 600px;
 }
 
 // Scrollbar styling

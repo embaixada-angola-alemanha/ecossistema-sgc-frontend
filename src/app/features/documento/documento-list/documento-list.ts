@@ -13,7 +13,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DatePipe } from '@angular/common';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -29,6 +29,7 @@ import { LoadingSpinner } from '../../../shared/components/loading-spinner/loadi
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { DocumentoDetailDialog } from '../documento-detail/documento-detail';
 import { DocumentoUploadDialog } from '../documento-upload/documento-upload';
+import { ConfirmDialog, ConfirmDialogData } from '../../../shared/components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'sgc-documento-list',
@@ -51,6 +52,7 @@ export class DocumentoList implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly loading = signal(false);
@@ -151,10 +153,20 @@ export class DocumentoList implements OnInit {
   }
 
   deleteDocumento(doc: Documento): void {
-    if (!confirm(`Eliminar documento ${doc.ficheiroNome ?? doc.id}?`)) return;
-    this.documentoService.delete(this.cidadaoId, doc.id).subscribe({
-      next: () => this.loadDocuments(),
-      error: () => this.snackBar.open('Erro ao eliminar', '', { duration: 3000 }),
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      width: 'min(400px, 90vw)',
+      data: {
+        title: this.translate.instant('common.confirm.title'),
+        message: this.translate.instant('common.confirm.delete', { name: doc.ficheiroNome ?? doc.id }),
+        warn: true,
+      } as ConfirmDialogData,
+    });
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.documentoService.delete(this.cidadaoId, doc.id).subscribe({
+        next: () => this.loadDocuments(),
+        error: () => this.snackBar.open('Erro ao eliminar', '', { duration: 3000 }),
+      });
     });
   }
 

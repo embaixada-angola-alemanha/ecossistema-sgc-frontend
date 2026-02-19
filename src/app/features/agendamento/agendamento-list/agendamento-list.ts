@@ -16,7 +16,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DatePipe } from '@angular/common';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -29,6 +29,7 @@ import {
 import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { AgendamentoDetailDialog } from '../agendamento-detail/agendamento-detail';
+import { ConfirmDialog, ConfirmDialogData } from '../../../shared/components/confirm-dialog/confirm-dialog';
 
 interface CalendarDay {
   date: Date;
@@ -60,6 +61,7 @@ export class AgendamentoList implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translate = inject(TranslateService);
 
   readonly loading = signal(true);
   readonly agendamentos = signal<Agendamento[]>([]);
@@ -70,7 +72,17 @@ export class AgendamentoList implements OnInit {
   readonly displayedColumns = ['cidadaoNome', 'numeroAgendamento', 'tipo', 'dataHora', 'estado', 'actions'];
   readonly tipoValues = TIPO_AGENDAMENTO_VALUES;
   readonly estadoValues = ESTADO_AGENDAMENTO_VALUES;
-  readonly weekDays = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'];
+  get weekDays(): string[] {
+    return [
+      this.translate.instant('calendar.mon'),
+      this.translate.instant('calendar.tue'),
+      this.translate.instant('calendar.wed'),
+      this.translate.instant('calendar.thu'),
+      this.translate.instant('calendar.fri'),
+      this.translate.instant('calendar.sat'),
+      this.translate.instant('calendar.sun'),
+    ];
+  }
 
   viewMode: 'calendar' | 'table' = 'calendar';
   page = 0;
@@ -142,7 +154,7 @@ export class AgendamentoList implements OnInit {
   changeEstado(agendamento: Agendamento, estado: EstadoAgendamento): void {
     this.agendamentoService.updateEstado(agendamento.id, estado).subscribe({
       next: () => this.loadData(),
-      error: () => this.snackBar.open('Erro ao alterar estado', '', { duration: 3000 }),
+      error: () => this.snackBar.open(this.translate.instant('common.error.statusChange'), '', { duration: 3000 }),
     });
   }
 
@@ -151,10 +163,20 @@ export class AgendamentoList implements OnInit {
   }
 
   deleteAgendamento(agendamento: Agendamento): void {
-    if (!confirm(`Eliminar agendamento ${agendamento.numeroAgendamento}?`)) return;
-    this.agendamentoService.delete(agendamento.id).subscribe({
-      next: () => this.loadData(),
-      error: () => this.snackBar.open('Erro ao eliminar', '', { duration: 3000 }),
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      width: 'min(400px, 90vw)',
+      data: {
+        title: this.translate.instant('common.confirm.title'),
+        message: this.translate.instant('common.confirm.delete', { name: agendamento.numeroAgendamento }),
+        warn: true,
+      } as ConfirmDialogData,
+    });
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.agendamentoService.delete(agendamento.id).subscribe({
+        next: () => this.loadData(),
+        error: () => this.snackBar.open(this.translate.instant('common.error.deleteFailed'), '', { duration: 3000 }),
+      });
     });
   }
 
@@ -187,11 +209,12 @@ export class AgendamentoList implements OnInit {
     const year = this.currentMonth.getFullYear();
     const month = this.currentMonth.getMonth();
 
-    const monthNames = [
-      'Janeiro', 'Fevereiro', 'Marco', 'Abril', 'Maio', 'Junho',
-      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+    const monthKeys = [
+      'calendar.january', 'calendar.february', 'calendar.march', 'calendar.april',
+      'calendar.may', 'calendar.june', 'calendar.july', 'calendar.august',
+      'calendar.september', 'calendar.october', 'calendar.november', 'calendar.december',
     ];
-    this.currentMonthLabel.set(`${monthNames[month]} ${year}`);
+    this.currentMonthLabel.set(`${this.translate.instant(monthKeys[month])} ${year}`);
 
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
@@ -242,7 +265,7 @@ export class AgendamentoList implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.snackBar.open('Erro ao carregar agendamentos', '', { duration: 3000 });
+        this.snackBar.open(this.translate.instant('common.error.loadFailed'), '', { duration: 3000 });
       },
     });
   }
@@ -262,7 +285,7 @@ export class AgendamentoList implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.snackBar.open('Erro ao carregar agendamentos', '', { duration: 3000 });
+        this.snackBar.open(this.translate.instant('common.error.loadFailed'), '', { duration: 3000 });
       },
     });
   }

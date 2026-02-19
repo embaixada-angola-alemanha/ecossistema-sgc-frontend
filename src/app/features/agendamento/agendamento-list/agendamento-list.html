@@ -56,7 +56,7 @@
           </div>
           <h3>{{ currentMonthLabel() }}</h3>
           <div class="calendar-nav">
-            <button mat-stroked-button (click)="goToToday()">Hoje</button>
+            <button mat-stroked-button (click)="goToToday()">{{ 'common.today' | translate }}</button>
             <button mat-icon-button (click)="nextMonth()"><mat-icon>chevron_right</mat-icon></button>
           </div>
         </div>
@@ -80,7 +80,7 @@
                   </div>
                 }
                 @if (day.events.length > 3) {
-                  <div class="day-more">+{{ day.events.length - 3 }} mais</div>
+                  <div class="day-more">+{{ day.events.length - 3 }} {{ 'common.more' | translate }}</div>
                 }
               </div>
             </div>

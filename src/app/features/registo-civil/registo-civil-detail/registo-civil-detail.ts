@@ -1,14 +1,14 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef, MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { RegistoCivilService } from '../../../core/services/registo-civil.service';
 import { AuthService } from '../../../core/services/auth.service';
 import {
@@ -18,6 +18,7 @@ import {
 import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { WorkflowStepper } from '../../../shared/components/workflow-stepper/workflow-stepper';
+import { ConfirmDialog, ConfirmDialogData } from '../../../shared/components/confirm-dialog/confirm-dialog';
 
 interface DialogData {
   registoId: string;
@@ -277,8 +278,10 @@ export class RegistoCivilDetailDialog implements OnInit {
   private readonly registoService = inject(RegistoCivilService);
   private readonly authService = inject(AuthService);
   private readonly dialogRef = inject(MatDialogRef<RegistoCivilDetailDialog>);
+  private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
   private readonly data: DialogData = inject(MAT_DIALOG_DATA);
 
   readonly loading = signal(true);
@@ -339,10 +342,21 @@ export class RegistoCivilDetailDialog implements OnInit {
 
   onDelete(): void {
     const r = this.registo();
-    if (!r || !confirm(`Eliminar registo ${r.numeroRegisto ?? r.id}?`)) return;
-    this.registoService.delete(r.id).subscribe({
-      next: () => this.dialogRef.close(true),
-      error: () => this.snackBar.open('Erro ao eliminar', '', { duration: 3000 }),
+    if (!r) return;
+    const confirmRef = this.dialog.open(ConfirmDialog, {
+      width: 'min(400px, 90vw)',
+      data: {
+        title: this.translate.instant('common.confirm.title'),
+        message: this.translate.instant('common.confirm.delete', { name: r.numeroRegisto ?? r.id }),
+        warn: true,
+      } as ConfirmDialogData,
+    });
+    confirmRef.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.registoService.delete(r.id).subscribe({
+        next: () => this.dialogRef.close(true),
+        error: () => this.snackBar.open('Erro ao eliminar', '', { duration: 3000 }),
+      });
     });
   }
 

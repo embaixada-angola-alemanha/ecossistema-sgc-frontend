@@ -1,11 +1,12 @@
 import { Component, input } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'sgc-status-badge',
   standalone: true,
-  imports: [MatChipsModule],
-  template: `<mat-chip [class]="'status-' + status().toLowerCase()" [attr.aria-label]="'Status: ' + status()">{{ status() }}</mat-chip>`,
+  imports: [MatChipsModule, TranslateModule],
+  template: `<mat-chip [class]="'status-' + status().toLowerCase()" [attr.aria-label]="'Status: ' + status()">{{ 'status.' + status() | translate }}</mat-chip>`,
   styles: `
     .status-pendente, .status-rascunho { background-color: #757575; color: white; }
     .status-em_analise, .status-submetido { background-color: #1976d2; color: white; }

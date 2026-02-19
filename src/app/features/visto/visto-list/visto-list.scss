@@ -1,94 +1,21 @@
+@use '../../../shared/styles/mixins' as m;
+
 .visto-page {
   max-width: 1200px;
 }
 
 .page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-
-  h2 {
-    margin: 0;
-    font-weight: 600;
-  }
+  @include m.page-header;
 }
 
 .filters-card {
-  margin-bottom: 16px;
-}
-
-.filters-row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: flex-start;
-}
-
-.search-field {
-  flex: 2;
-  min-width: 200px;
-}
-
-.filter-field {
-  flex: 1;
-  min-width: 140px;
+  @include m.filters-card;
 }
 
 .table-card {
-  overflow: hidden;
-}
-
-table {
-  width: 100%;
-}
-
-.name-cell {
-  font-weight: 500;
-  cursor: pointer;
-  color: var(--gold, #c9a84c);
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
-.mono {
-  font-family: 'DM Sans', monospace;
-  letter-spacing: 0.05em;
-}
-
-.clickable-row {
-  cursor: pointer;
-
-  &:hover {
-    background: var(--gold-dim, rgba(201, 168, 76, 0.06)) !important;
-  }
+  @include m.table-card;
 }
 
 .no-data {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 48px;
-  color: rgba(224, 232, 240, 0.65); // ↑ contrast improved from 0.4
-
-  mat-icon {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
-  }
-}
-
-.delete-action {
-  color: #f44336 !important;
-
-  mat-icon {
-    color: #f44336 !important;
-  }
-}
-
-mat-paginator {
-  border-top: 1px solid var(--border, rgba(201, 168, 76, 0.08));
+  @include m.no-data;
 }

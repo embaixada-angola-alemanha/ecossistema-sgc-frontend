@@ -5,13 +5,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CidadaoService } from '../../../core/services/cidadao.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Cidadao } from '../../../core/models/cidadao.model';
 import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { CidadaoFormDialog } from '../cidadao-form/cidadao-form';
+import { ConfirmDialog, ConfirmDialogData } from '../../../shared/components/confirm-dialog/confirm-dialog';
 
 interface DialogData {
   cidadaoId: string;
@@ -105,7 +106,7 @@ interface DialogData {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
-      min-width: 460px;
+      min-width: min(460px, 90vw);
     }
     .detail-row {
       display: flex;
@@ -134,6 +135,7 @@ export class CidadaoDetailDialog implements OnInit {
   private readonly dialogRef = inject(MatDialogRef<CidadaoDetailDialog>);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
   private readonly data: DialogData = inject(MAT_DIALOG_DATA);
 
   readonly loading = signal(true);
@@ -153,7 +155,7 @@ export class CidadaoDetailDialog implements OnInit {
 
   onEdit(): void {
     const ref = this.dialog.open(CidadaoFormDialog, {
-      width: '640px',
+      width: 'min(640px, 95vw)',
       data: { cidadao: this.cidadao() },
     });
     ref.afterClosed().subscribe((result) => {
@@ -166,10 +168,21 @@ export class CidadaoDetailDialog implements OnInit {
 
   onDelete(): void {
     const c = this.cidadao();
-    if (!c || !confirm(`Eliminar ${c.nomeCompleto}?`)) return;
-    this.cidadaoService.delete(c.id).subscribe({
-      next: () => this.dialogRef.close(true),
-      error: () => this.snackBar.open('Erro ao eliminar', '', { duration: 3000 }),
+    if (!c) return;
+    const confirmRef = this.dialog.open(ConfirmDialog, {
+      width: 'min(400px, 90vw)',
+      data: {
+        title: this.translate.instant('common.confirm.title'),
+        message: this.translate.instant('common.confirm.delete', { name: c.nomeCompleto }),
+        warn: true,
+      } as ConfirmDialogData,
+    });
+    confirmRef.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.cidadaoService.delete(c.id).subscribe({
+        next: () => this.dialogRef.close(true),
+        error: () => this.snackBar.open('Erro ao eliminar', '', { duration: 3000 }),
+      });
     });
   }
 }
