@@ -18,6 +18,8 @@ import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { RegistoCivilService } from '../../../core/services/registo-civil.service';
 import { CidadaoService } from '../../../core/services/cidadao.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { CitizenContextService } from '../../../core/services/citizen-context.service';
 import { Cidadao } from '../../../core/models/cidadao.model';
 import {
   RegistoCivil, RegistoCivilCreate, TipoRegistoCivil,
@@ -50,12 +52,15 @@ export class RegistoCivilForm implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly authService = inject(AuthService);
+  private readonly citizenContext = inject(CitizenContextService);
 
   readonly loading = signal(true);
   readonly saving = signal(false);
   readonly cidadaos = signal<Cidadao[]>([]);
   readonly selectedCidadao = signal<Cidadao | null>(null);
   readonly tipoValues = TIPO_REGISTO_CIVIL_VALUES;
+  readonly isCitizenOnly = this.authService.isCitizenOnly();
 
   cidadaoForm!: FormGroup;
   tipoForm!: FormGroup;
@@ -100,9 +105,17 @@ export class RegistoCivilForm implements OnInit {
       dataObito: [null],
     });
 
-    this.cidadaoService.getAll(0, 200).subscribe((data) => {
-      this.cidadaos.set(data.content);
-    });
+    if (this.isCitizenOnly) {
+      const cid = this.citizenContext.cidadaoId();
+      if (cid) {
+        this.cidadaoForm.patchValue({ cidadaoId: cid });
+        this.onCidadaoSelect(cid);
+      }
+    } else {
+      this.cidadaoService.getAll(0, 200).subscribe((data) => {
+        this.cidadaos.set(data.content);
+      });
+    }
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {

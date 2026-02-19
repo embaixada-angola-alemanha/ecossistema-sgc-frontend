@@ -15,6 +15,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { DatePipe } from '@angular/common';
 import { AgendamentoService } from '../../../core/services/agendamento.service';
 import { CidadaoService } from '../../../core/services/cidadao.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { CitizenContextService } from '../../../core/services/citizen-context.service';
 import { Cidadao } from '../../../core/models/cidadao.model';
 import {
   Agendamento, AgendamentoCreate, SlotDisponivel,
@@ -42,6 +44,8 @@ export class AgendamentoForm implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly authService = inject(AuthService);
+  private readonly citizenContext = inject(CitizenContextService);
 
   readonly loading = signal(false);
   readonly loadingSlots = signal(false);
@@ -58,13 +62,21 @@ export class AgendamentoForm implements OnInit {
   notas = '';
   editId = '';
   today = new Date();
+  readonly isCitizenOnly = this.authService.isCitizenOnly();
 
   private existingAgendamento: Agendamento | null = null;
 
   ngOnInit(): void {
-    this.cidadaoService.getAll(0, 200).subscribe({
-      next: (data) => this.cidadaos.set(data.content),
-    });
+    if (this.isCitizenOnly) {
+      const cid = this.citizenContext.cidadaoId();
+      if (cid) {
+        this.cidadaoId = cid;
+      }
+    } else {
+      this.cidadaoService.getAll(0, 200).subscribe({
+        next: (data) => this.cidadaos.set(data.content),
+      });
+    }
 
     const id = this.route.snapshot.params['id'];
     if (id) {

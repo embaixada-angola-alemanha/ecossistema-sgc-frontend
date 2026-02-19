@@ -12,7 +12,7 @@
     <mat-card>
       <mat-card-content>
         <div class="form-grid">
-          @if (!isEdit()) {
+          @if (!isEdit() && !isCitizenOnly) {
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>{{ 'agendamento.cidadaoNome' | translate }}</mat-label>
               <mat-select [(ngModel)]="cidadaoId" #cidadaoIdCtrl="ngModel" required>

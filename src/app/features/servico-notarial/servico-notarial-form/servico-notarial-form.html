@@ -14,17 +14,19 @@
       <mat-step [stepControl]="cidadaoForm">
         <ng-template matStepLabel>{{ 'servicoNotarial.step.cidadao' | translate }}</ng-template>
         <form [formGroup]="cidadaoForm" class="step-content">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>{{ 'servicoNotarial.cidadaoNome' | translate }}</mat-label>
-            <mat-select formControlName="cidadaoId" (selectionChange)="onCidadaoSelect($event.value)">
-              @for (c of cidadaos(); track c.id) {
-                <mat-option [value]="c.id">{{ c.nomeCompleto }} ({{ c.numeroPassaporte }})</mat-option>
+          @if (!isCitizenOnly) {
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>{{ 'servicoNotarial.cidadaoNome' | translate }}</mat-label>
+              <mat-select formControlName="cidadaoId" (selectionChange)="onCidadaoSelect($event.value)">
+                @for (c of cidadaos(); track c.id) {
+                  <mat-option [value]="c.id">{{ c.nomeCompleto }} ({{ c.numeroPassaporte }})</mat-option>
+                }
+              </mat-select>
+              @if (cidadaoForm.get('cidadaoId')?.hasError('required')) {
+                <mat-error>{{ 'validation.required' | translate }}</mat-error>
               }
-            </mat-select>
-            @if (cidadaoForm.get('cidadaoId')?.hasError('required')) {
-              <mat-error>{{ 'validation.required' | translate }}</mat-error>
-            }
-          </mat-form-field>
+            </mat-form-field>
+          }
 
           @if (selectedCidadao()) {
             <mat-card class="info-card">

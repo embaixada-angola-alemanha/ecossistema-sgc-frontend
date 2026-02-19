@@ -16,6 +16,8 @@ import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ServicoNotarialService } from '../../../core/services/servico-notarial.service';
 import { CidadaoService } from '../../../core/services/cidadao.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { CitizenContextService } from '../../../core/services/citizen-context.service';
 import { Cidadao } from '../../../core/models/cidadao.model';
 import {
   ServicoNotarial, ServicoNotarialCreate, TipoServicoNotarial,
@@ -47,6 +49,8 @@ export class ServicoNotarialForm implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly authService = inject(AuthService);
+  private readonly citizenContext = inject(CitizenContextService);
 
   readonly loading = signal(true);
   readonly saving = signal(false);
@@ -54,6 +58,7 @@ export class ServicoNotarialForm implements OnInit {
   readonly selectedCidadao = signal<Cidadao | null>(null);
   readonly fee = signal<NotarialFee | null>(null);
   readonly tipoValues = TIPO_SERVICO_NOTARIAL_VALUES;
+  readonly isCitizenOnly = this.authService.isCitizenOnly();
 
   cidadaoForm!: FormGroup;
   tipoForm!: FormGroup;
@@ -99,9 +104,17 @@ export class ServicoNotarialForm implements OnInit {
       numeroCopias: [1],
     });
 
-    this.cidadaoService.getAll(0, 200).subscribe((data) => {
-      this.cidadaos.set(data.content);
-    });
+    if (this.isCitizenOnly) {
+      const cid = this.citizenContext.cidadaoId();
+      if (cid) {
+        this.cidadaoForm.patchValue({ cidadaoId: cid });
+        this.onCidadaoSelect(cid);
+      }
+    } else {
+      this.cidadaoService.getAll(0, 200).subscribe((data) => {
+        this.cidadaos.set(data.content);
+      });
+    }
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {

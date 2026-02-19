@@ -24,6 +24,8 @@ import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { VistoService } from '../../../core/services/visto.service';
 import { CidadaoService } from '../../../core/services/cidadao.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { CitizenContextService } from '../../../core/services/citizen-context.service';
 import { Cidadao } from '../../../core/models/cidadao.model';
 import {
   Visto, VistoCreate, TipoVisto, VistoFee, VistoChecklist,
@@ -59,6 +61,8 @@ export class VistoStepper implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
   private readonly translate = inject(TranslateService);
+  private readonly authService = inject(AuthService);
+  private readonly citizenContext = inject(CitizenContextService);
 
   readonly loading = signal(true);
   readonly saving = signal(false);
@@ -67,6 +71,7 @@ export class VistoStepper implements OnInit {
   readonly fee = signal<VistoFee | null>(null);
   readonly checklist = signal<VistoChecklist | null>(null);
   readonly tipoValues = TIPO_VISTO_VALUES;
+  readonly isCitizenOnly = this.authService.isCitizenOnly();
 
   cidadaoForm!: FormGroup;
   tipoForm!: FormGroup;
@@ -100,9 +105,17 @@ export class VistoStepper implements OnInit {
       taxaPaga: [false],
     });
 
-    this.cidadaoService.getAll(0, 200).subscribe((data) => {
-      this.cidadaos.set(data.content);
-    });
+    if (this.isCitizenOnly) {
+      const cid = this.citizenContext.cidadaoId();
+      if (cid) {
+        this.cidadaoForm.patchValue({ cidadaoId: cid });
+        this.onCidadaoSelect(cid);
+      }
+    } else {
+      this.cidadaoService.getAll(0, 200).subscribe((data) => {
+        this.cidadaos.set(data.content);
+      });
+    }
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
