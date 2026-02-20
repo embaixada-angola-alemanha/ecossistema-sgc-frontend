@@ -1,9 +1,10 @@
 FROM node:20-alpine AS build
+ARG BUILD_CONFIG=production
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
-RUN npx ng build --configuration=production
+RUN npx ng build --configuration=$BUILD_CONFIG
 
 FROM nginx:1.25-alpine
 LABEL maintainer="Ecossistema Digital <dev@embaixada-angola.site>"

@@ -23,6 +23,9 @@
                   <mat-icon>{{ item.icon }}</mat-icon>
                 </div>
                 <span>{{ item.labelKey | translate }}</span>
+                @if (getBadge(item)) {
+                  <span class="nav-badge">{{ getBadge(item) }}</span>
+                }
               </a>
             }
           }
@@ -41,6 +44,13 @@
         </button>
       </div>
       <div class="top-right">
+        <!-- Global Search -->
+        <div class="global-search" role="search">
+          <mat-icon aria-hidden="true">search</mat-icon>
+          <input type="text" [placeholder]="'dashboard.search' | translate"
+                 aria-label="Global search" (keyup.enter)="onSearch($event)" #searchInput>
+        </div>
+
         <!-- Language Switcher -->
         <button mat-button [matMenuTriggerFor]="langMenu" class="lang-btn"
                 [attr.aria-label]="'Language: ' + currentLang().toUpperCase()">

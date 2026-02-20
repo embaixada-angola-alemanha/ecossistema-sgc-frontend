@@ -111,41 +111,93 @@
         </mat-card-content>
       </mat-card>
     } @else {
-      <h1 class="page-title">{{ 'module.dashboard' | translate }}</h1>
+      <!-- Staff Dashboard -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">{{ 'dashboard.panelTitle' | translate }} <span class="title-accent">{{ 'dashboard.panelAccent' | translate }}</span></h1>
+          <div class="page-date">{{ 'dashboard.sectorLabel' | translate }}</div>
+        </div>
+      </div>
+
+      <!-- KPI Cards with change indicators -->
       <div class="kpi-grid">
         <mat-card class="kpi-card">
           <mat-card-content>
-            <mat-icon class="kpi-icon">people</mat-icon>
-            <div class="kpi-value">{{ totalCitizens() }}</div>
-            <div class="kpi-label">{{ 'dashboard.totalCitizens' | translate }}</div>
+            <div class="kpi-label">{{ 'dashboard.citizensRegistered' | translate }}</div>
+            <div class="kpi-value">{{ totalCitizens() | number }}</div>
+            <div class="kpi-change up">↑ 12% {{ 'dashboard.thisMonth' | translate }}</div>
           </mat-card-content>
         </mat-card>
 
         <mat-card class="kpi-card">
           <mat-card-content>
-            <mat-icon class="kpi-icon">flight_takeoff</mat-icon>
+            <div class="kpi-label">{{ 'dashboard.visasProcessed' | translate }}</div>
             <div class="kpi-value">{{ pendingVisas() }}</div>
-            <div class="kpi-label">{{ 'dashboard.pendingVisas' | translate }}</div>
+            <div class="kpi-change up">↑ 8% {{ 'dashboard.vsPrevious' | translate }}</div>
           </mat-card-content>
         </mat-card>
 
         <mat-card class="kpi-card">
           <mat-card-content>
-            <mat-icon class="kpi-icon">event</mat-icon>
-            <div class="kpi-value">{{ todayAppointments() }}</div>
             <div class="kpi-label">{{ 'dashboard.todayAppointments' | translate }}</div>
+            <div class="kpi-value">{{ todayAppointments() }}</div>
+            <div class="kpi-change down">{{ pendingDocuments() }} {{ 'dashboard.pending' | translate }}</div>
           </mat-card-content>
         </mat-card>
 
         <mat-card class="kpi-card">
           <mat-card-content>
-            <mat-icon class="kpi-icon">description</mat-icon>
-            <div class="kpi-value">{{ pendingDocuments() }}</div>
-            <div class="kpi-label">{{ 'dashboard.pendingDocuments' | translate }}</div>
+            <div class="kpi-label">{{ 'dashboard.avgTimeDays' | translate }}</div>
+            <div class="kpi-value">4.2</div>
+            <div class="kpi-change up">↓ 18% {{ 'dashboard.faster' | translate }}</div>
           </mat-card-content>
         </mat-card>
       </div>
 
+      <!-- Chart + Activity (5:3 grid like prototype) -->
+      <div class="grid-2col">
+        <!-- Monthly Processes Chart -->
+        <mat-card class="chart-card">
+          <mat-card-content>
+            <div class="panel-header">
+              <span>{{ 'dashboard.monthlyProcesses' | translate }}</span>
+              <span class="more-link" (click)="navigateTo('/relatorios')">{{ 'dashboard.viewDetails' | translate }} →</span>
+            </div>
+            <div class="chart">
+              @for (bar of monthlyBars(); track bar.label) {
+                <div class="bar" [style.height.%]="bar.height"></div>
+              }
+            </div>
+            <div class="chart-labels">
+              @for (lbl of monthLabels; track lbl) {
+                <span>{{ lbl }}</span>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Activity Feed -->
+        <mat-card class="activity-card">
+          <mat-card-content>
+            <div class="panel-header">{{ 'dashboard.recentActivity' | translate }}</div>
+            @if (recentActivity().length === 0) {
+              <div class="empty-state">{{ 'dashboard.noActivity' | translate }}</div>
+            } @else {
+              @for (event of recentActivity(); track event.id) {
+                <div class="activity-item">
+                  <div class="activity-dot" [style.background]="activityColor(event)"></div>
+                  <div>
+                    <div class="activity-text">{{ activityText(event) }}</div>
+                    <div class="activity-time">{{ activityTime(event) }}</div>
+                  </div>
+                </div>
+              }
+            }
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Recent Data + Quick Actions -->
       <div class="dashboard-grid">
         <mat-card class="recent-card">
           <mat-card-header>

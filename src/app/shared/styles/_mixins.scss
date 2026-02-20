@@ -1,18 +1,26 @@
+// ══════════════════════════════════════════════════════════════
+// SHARED MIXINS — "Diplomacia Clássica"
+// ══════════════════════════════════════════════════════════════
+
 @mixin page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 
   h1, h2 {
     margin: 0;
+    font-family: 'Playfair Display', serif;
     font-weight: 600;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
+    color: var(--gold-light);
+    letter-spacing: 0.01em;
   }
 }
 
 @mixin filters-card {
   margin-bottom: 16px;
+  padding: 16px 20px !important;
 
   .filters-row {
     display: flex;
@@ -23,7 +31,7 @@
 
   .search-field {
     flex: 1;
-    min-width: 200px;
+    min-width: 220px;
   }
 
   .filter-field {
@@ -35,6 +43,7 @@
   overflow: hidden;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  padding: 0 !important;
 
   table {
     width: 100%;
@@ -42,50 +51,60 @@
 
   .clickable-row {
     cursor: pointer;
+    transition: background 180ms cubic-bezier(0.4, 0, 0.2, 1);
+
     &:hover {
-      background: var(--gold-dim);
+      background: var(--gold-glow);
     }
   }
 
   .name-cell {
-    color: var(--gold);
+    color: var(--gold-light);
     cursor: pointer;
     font-weight: 500;
+    transition: color 180ms;
+
     &:hover {
+      color: var(--gold-bright);
       text-decoration: underline;
+      text-underline-offset: 2px;
     }
   }
 
   .mono {
-    font-family: monospace;
-    font-size: 0.85rem;
+    font-family: 'JetBrains Mono', 'SF Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    letter-spacing: -0.02em;
   }
 
   .delete-action {
-    color: #ef5350 !important;
+    color: var(--red) !important;
   }
 
   mat-paginator {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--divider);
   }
 }
 
 @mixin no-data {
   text-align: center;
-  padding: 48px;
-  color: var(--text-dim);
+  padding: 56px 24px;
+  color: var(--text-muted);
 
   mat-icon {
     font-size: 48px;
     width: 48px;
     height: 48px;
     margin-bottom: 16px;
-    opacity: 0.5;
+    opacity: 0.4;
+    color: var(--gold);
   }
 
   p {
     margin: 8px 0 0;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
   }
 }
 

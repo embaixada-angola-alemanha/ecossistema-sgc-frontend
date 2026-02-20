@@ -1,19 +1,61 @@
 @use '@angular/material' as mat;
 
+// ══════════════════════════════════════════════════════════════
+// DIPLOMACIA CLÁSSICA — SGC Theme
+// Embaixada de Angola na Alemanha
+// ══════════════════════════════════════════════════════════════
+
 :root {
-  --bg: #0c0f14;
-  --surface: #141821;
-  --surface2: #1a1f2b;
-  --gold: #c9a84c;
-  --gold-light: #e8d08e;
-  --gold-dim: rgba(201, 168, 76, 0.12);
-  --red: #cc092f;
-  --green: #4d9a5c;
-  --text: #f0ece4;
-  --text-dim: rgba(240, 236, 228, 0.78);
-  --border: rgba(201, 168, 76, 0.15);
+  // ─── Core Palette ───────────────────────────────────────
+  --bg:           #0b0e13;
+  --surface:      #12161e;
+  --surface2:     #181d27;
+  --surface3:     #1e2433;
+
+  // ─── Gold System (Angola Flag Inspired) ─────────────────
+  --gold:         #c8a44e;
+  --gold-light:   #dcc37a;
+  --gold-bright:  #e6d290;
+  --gold-dim:     rgba(200, 164, 78, 0.10);
+  --gold-glow:    rgba(200, 164, 78, 0.06);
+
+  // ─── Accent ─────────────────────────────────────────────
+  --red:          #c4243b;
+  --red-soft:     rgba(196, 36, 59, 0.12);
+  --green:        #3d8b4f;
+  --green-soft:   rgba(61, 139, 79, 0.12);
+  --blue:         #4a7fb5;
+  --blue-soft:    rgba(74, 127, 181, 0.12);
+  --amber:        #c9952a;
+  --amber-soft:   rgba(201, 149, 42, 0.12);
+
+  // ─── Text ───────────────────────────────────────────────
+  --text:         #eae5db;
+  --text-secondary: rgba(234, 229, 219, 0.68);
+  --text-muted:   rgba(234, 229, 219, 0.42);
+
+  // ─── Borders & Dividers ─────────────────────────────────
+  --border:       rgba(200, 164, 78, 0.12);
+  --border-strong: rgba(200, 164, 78, 0.22);
+  --divider:      rgba(234, 229, 219, 0.06);
+
+  // ─── Shadows ────────────────────────────────────────────
+  --shadow-sm:    0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md:    0 4px 16px rgba(0,0,0,0.35);
+  --shadow-lg:    0 8px 32px rgba(0,0,0,0.4);
+  --shadow-gold:  0 2px 12px rgba(200, 164, 78, 0.15);
+
+  // ─── Radius ─────────────────────────────────────────────
+  --radius-sm:    6px;
+  --radius-md:    10px;
+  --radius-lg:    14px;
+
+  // ─── Transitions ────────────────────────────────────────
+  --ease:         cubic-bezier(0.4, 0, 0.2, 1);
+  --duration:     180ms;
 }
 
+// ─── Angular Material Theme ──────────────────────────────
 html {
   height: 100%;
   @include mat.theme((
@@ -29,105 +71,189 @@ html {
 
 body {
   color-scheme: dark;
-  background-color: var(--bg);
+  background: var(--bg);
   color: var(--text);
   font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
   margin: 0;
   height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-// Override Material component colors for dark theme
-.mat-mdc-menu-panel {
-  background: var(--surface) !important;
-  border: 1px solid var(--border);
+// ══════════════════════════════════════════════════════════════
+// MATERIAL COMPONENT OVERRIDES
+// ══════════════════════════════════════════════════════════════
+
+// ─── Buttons ─────────────────────────────────────────────
+.mat-mdc-raised-button.mat-primary,
+.mat-mdc-unelevated-button.mat-primary {
+  --mdc-filled-button-container-color: var(--gold) !important;
+  --mdc-filled-button-label-text-color: var(--bg) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em;
+  border-radius: var(--radius-sm) !important;
+
+  &:hover {
+    --mdc-filled-button-container-color: var(--gold-light) !important;
+  }
 }
 
-.mat-mdc-menu-item {
-  color: var(--text) !important;
+.mat-mdc-outlined-button {
+  --mdc-outlined-button-outline-color: var(--border-strong) !important;
+  --mdc-outlined-button-label-text-color: var(--text) !important;
+  border-radius: var(--radius-sm) !important;
 
   &:hover {
     background: var(--gold-dim) !important;
   }
 }
 
-.mat-mdc-menu-item .mat-icon {
-  color: var(--gold) !important;
+.mat-mdc-icon-button {
+  --mdc-icon-button-icon-color: var(--text-secondary);
+
+  &:hover {
+    --mdc-icon-button-icon-color: var(--gold);
+  }
 }
 
-// Override Material card for dark theme
+// ─── Cards ───────────────────────────────────────────────
 .mat-mdc-card {
   background: var(--surface) !important;
   border: 1px solid var(--border) !important;
-  border-radius: 12px !important;
+  border-radius: var(--radius-lg) !important;
   color: var(--text) !important;
+  box-shadow: var(--shadow-sm) !important;
   position: relative;
   overflow: hidden;
 
-  &::after {
+  &::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(90deg, var(--gold), transparent);
+    background: linear-gradient(90deg, var(--gold) 0%, var(--gold-dim) 70%, transparent 100%);
   }
 }
 
 .mat-mdc-card-header {
   .mat-mdc-card-title {
     font-family: 'Playfair Display', serif !important;
+    font-weight: 600 !important;
     color: var(--gold-light) !important;
+    font-size: 1.1rem !important;
   }
 
   .mat-mdc-card-subtitle {
-    color: var(--text-dim) !important;
+    color: var(--text-secondary) !important;
   }
 }
 
-.mat-mdc-card .mat-icon {
-  color: var(--gold) !important;
+// ─── Menus ───────────────────────────────────────────────
+.mat-mdc-menu-panel {
+  background: var(--surface2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
 }
 
-// Override Material toolbar
-.mat-toolbar {
+.mat-mdc-menu-item {
+  color: var(--text) !important;
+  font-size: 13px !important;
+  min-height: 40px !important;
+
+  &:hover {
+    background: var(--gold-dim) !important;
+  }
+
+  .mat-icon {
+    color: var(--gold) !important;
+    margin-right: 12px;
+  }
+}
+
+// ─── Dialogs ─────────────────────────────────────────────
+.mat-mdc-dialog-container .mdc-dialog__surface {
   background: var(--surface) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.mat-mdc-dialog-title {
+  font-family: 'Playfair Display', serif !important;
+  color: var(--gold-light) !important;
+  font-weight: 600 !important;
+  padding-bottom: 8px !important;
+  border-bottom: 1px solid var(--divider);
+}
+
+.mat-mdc-dialog-content {
   color: var(--text) !important;
 }
 
-// Override Material progress spinner
-.mat-mdc-progress-spinner circle {
-  stroke: var(--gold) !important;
+.mat-mdc-dialog-actions {
+  border-top: 1px solid var(--divider);
+  padding-top: 16px !important;
 }
 
-// Table responsive horizontal scroll + readability
+// ─── Tables ──────────────────────────────────────────────
 .mat-mdc-table {
   min-width: 600px;
+  background: transparent !important;
+
+  .mat-mdc-header-row {
+    background: var(--surface2) !important;
+  }
 
   .mat-mdc-header-cell {
-    color: var(--text) !important;
+    color: var(--text-secondary) !important;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-bottom-color: var(--border) !important;
   }
 
   .mat-mdc-cell {
     color: var(--text) !important;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
+    border-bottom-color: var(--divider) !important;
   }
 
-  .mat-mdc-row:hover {
-    background: var(--gold-dim) !important;
+  .mat-mdc-row {
+    transition: background var(--duration) var(--ease);
+
+    &:hover {
+      background: var(--gold-glow) !important;
+    }
   }
 }
 
-// Form field readability
+// ─── Form Fields ─────────────────────────────────────────
 .mat-mdc-form-field {
   .mdc-text-field--outlined .mdc-notched-outline__leading,
   .mdc-text-field--outlined .mdc-notched-outline__notch,
   .mdc-text-field--outlined .mdc-notched-outline__trailing {
-    border-color: rgba(240, 236, 228, 0.25) !important;
+    border-color: var(--border-strong) !important;
+  }
+
+  .mdc-text-field--outlined:hover .mdc-notched-outline__leading,
+  .mdc-text-field--outlined:hover .mdc-notched-outline__notch,
+  .mdc-text-field--outlined:hover .mdc-notched-outline__trailing {
+    border-color: var(--gold) !important;
+  }
+
+  .mdc-text-field--focused .mdc-notched-outline__leading,
+  .mdc-text-field--focused .mdc-notched-outline__notch,
+  .mdc-text-field--focused .mdc-notched-outline__trailing {
+    border-color: var(--gold) !important;
+    border-width: 2px !important;
   }
 }
 
@@ -137,71 +263,26 @@ body {
 }
 
 .mat-mdc-floating-label {
-  color: var(--text-dim) !important;
+  color: var(--text-secondary) !important;
 }
 
-// Paginator readability
-.mat-mdc-paginator {
-  color: var(--text) !important;
-  background: transparent !important;
-}
-
-// Snackbar readability
-.mat-mdc-snack-bar-container .mdc-snackbar__surface {
-  background: var(--surface2) !important;
-  border: 1px solid var(--border);
-}
-
-.mat-mdc-snack-bar-label {
-  color: var(--text) !important;
-}
-
-// Force dark surfaces on ALL Material components
-.mat-mdc-dialog-container .mdc-dialog__surface {
-  background: var(--surface) !important;
-  color: var(--text) !important;
-}
-
-.mat-mdc-dialog-title {
-  color: var(--text) !important;
-}
-
-.mat-mdc-dialog-content {
-  color: var(--text) !important;
-}
-
-.mat-mdc-tab-header {
-  background: var(--surface) !important;
-}
-
-.mat-mdc-tab:not(.mdc-tab--active) .mdc-tab__text-label {
-  color: var(--text-dim) !important;
-}
-
-.mdc-tab--active .mdc-tab__text-label {
+.mdc-text-field--focused .mat-mdc-floating-label {
   color: var(--gold) !important;
 }
 
-.mat-mdc-tab-body-wrapper {
-  background: var(--surface) !important;
-}
-
-.mat-step-header {
-  background: transparent !important;
-  color: var(--text) !important;
-}
-
-.mat-mdc-chip {
+// ─── Select Panels ───────────────────────────────────────
+.mat-mdc-select-panel,
+.mat-mdc-autocomplete-panel {
   background: var(--surface2) !important;
-  color: var(--text) !important;
-}
-
-.mat-mdc-select-panel {
-  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-md) !important;
 }
 
 .mat-mdc-option {
   color: var(--text) !important;
+  font-size: 13px !important;
+  min-height: 40px !important;
 
   &:hover {
     background: var(--gold-dim) !important;
@@ -213,13 +294,80 @@ body {
   }
 }
 
-.mat-mdc-autocomplete-panel {
+// ─── Toolbar ─────────────────────────────────────────────
+.mat-toolbar {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+}
+
+// ─── Progress ────────────────────────────────────────────
+.mat-mdc-progress-spinner circle {
+  stroke: var(--gold) !important;
+}
+
+.mat-mdc-progress-bar .mdc-linear-progress__bar-inner {
+  border-color: var(--gold) !important;
+}
+
+// ─── Paginator ───────────────────────────────────────────
+.mat-mdc-paginator {
+  color: var(--text-secondary) !important;
+  background: transparent !important;
+  font-size: 0.8rem;
+}
+
+// ─── Tabs ────────────────────────────────────────────────
+.mat-mdc-tab-header {
+  background: var(--surface) !important;
+  border-bottom: 1px solid var(--divider);
+}
+
+.mat-mdc-tab:not(.mdc-tab--active) .mdc-tab__text-label {
+  color: var(--text-secondary) !important;
+}
+
+.mdc-tab--active .mdc-tab__text-label {
+  color: var(--gold) !important;
+  font-weight: 600;
+}
+
+.mat-mdc-tab-body-wrapper {
   background: var(--surface) !important;
 }
 
+// ─── Stepper ─────────────────────────────────────────────
+.mat-step-header {
+  background: transparent !important;
+  color: var(--text) !important;
+}
+
+// ─── Chips ───────────────────────────────────────────────
+.mat-mdc-chip {
+  background: var(--surface2) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  font-size: 0.8rem !important;
+}
+
+// ─── Snackbar ────────────────────────────────────────────
+.mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  background: var(--surface2) !important;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+.mat-mdc-snack-bar-label {
+  color: var(--text) !important;
+}
+
+// ─── Datepicker ──────────────────────────────────────────
 .mat-datepicker-content {
   background: var(--surface) !important;
   color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
 }
 
 .mat-calendar-body-cell-content {
@@ -229,6 +377,7 @@ body {
 .mat-calendar-body-selected {
   background: var(--gold) !important;
   color: var(--bg) !important;
+  font-weight: 600;
 }
 
 .mat-calendar-body-today:not(.mat-calendar-body-selected) {
@@ -236,26 +385,56 @@ body {
 }
 
 .mat-calendar-table-header th {
-  color: var(--text-dim) !important;
+  color: var(--text-muted) !important;
 }
 
 .mat-calendar-arrow {
   fill: var(--text) !important;
 }
 
+// ─── Button Toggle ───────────────────────────────────────
 .mat-mdc-button-toggle-group {
   background: var(--surface) !important;
   border-color: var(--border) !important;
+  border-radius: var(--radius-sm) !important;
 }
 
 .mat-mdc-button-toggle {
-  color: var(--text-dim) !important;
+  color: var(--text-secondary) !important;
   background: transparent !important;
 
   &.mat-button-toggle-checked {
     background: var(--gold-dim) !important;
     color: var(--gold) !important;
   }
+}
+
+// ─── Tooltip ─────────────────────────────────────────────
+.mat-mdc-tooltip .mdc-tooltip__surface {
+  background: var(--surface3) !important;
+  color: var(--text) !important;
+  font-size: 12px !important;
+  border: 1px solid var(--border) !important;
+}
+
+// ══════════════════════════════════════════════════════════════
+// UTILITY CLASSES
+// ══════════════════════════════════════════════════════════════
+
+// Status badges
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+
+  &.status-active, &.status-activo   { background: var(--green-soft); color: var(--green); }
+  &.status-inactive, &.status-inactivo { background: var(--red-soft); color: var(--red); }
+  &.status-pending, &.status-pendente { background: var(--amber-soft); color: var(--amber); }
+  &.status-info                       { background: var(--blue-soft); color: var(--blue); }
 }
 
 // Screen-reader-only utility (WCAG 2.1 AA)
@@ -271,20 +450,29 @@ body {
   border: 0;
 }
 
-// Scrollbar styling
+// ══════════════════════════════════════════════════════════════
+// SCROLLBAR
+// ══════════════════════════════════════════════════════════════
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(201, 168, 76, 0.2);
-  border-radius: 3px;
+  background: rgba(200, 164, 78, 0.18);
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(201, 168, 76, 0.35);
+  background: rgba(200, 164, 78, 0.32);
+}
+
+// Firefox scrollbar
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(200, 164, 78, 0.18) transparent;
 }

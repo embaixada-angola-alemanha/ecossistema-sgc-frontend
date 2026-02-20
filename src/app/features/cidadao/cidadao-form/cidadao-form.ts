@@ -55,40 +55,53 @@ interface DialogData {
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'cidadao.dataNascimento' | translate }}</mat-label>
+          <mat-label>{{ 'cidadao.dataNascimento' | translate }} *</mat-label>
           <input matInput [matDatepicker]="picker" formControlName="dataNascimento">
           <mat-datepicker-toggle matSuffix [for]="picker" />
           <mat-datepicker #picker />
+          @if (form.get('dataNascimento')?.hasError('required')) {
+            <mat-error>{{ 'validation.required' | translate }}</mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'cidadao.sexo' | translate }}</mat-label>
+          <mat-label>{{ 'cidadao.sexo' | translate }} *</mat-label>
           <mat-select formControlName="sexo">
-            <mat-option [value]="null">—</mat-option>
             @for (s of sexos; track s) {
               <mat-option [value]="s">{{ 'cidadao.sexo.' + s | translate }}</mat-option>
             }
           </mat-select>
+          @if (form.get('sexo')?.hasError('required')) {
+            <mat-error>{{ 'validation.required' | translate }}</mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'cidadao.nacionalidade' | translate }}</mat-label>
+          <mat-label>{{ 'cidadao.nacionalidade' | translate }} *</mat-label>
           <input matInput formControlName="nacionalidade">
+          @if (form.get('nacionalidade')?.hasError('required')) {
+            <mat-error>{{ 'validation.required' | translate }}</mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'cidadao.estadoCivil' | translate }}</mat-label>
+          <mat-label>{{ 'cidadao.estadoCivil' | translate }} *</mat-label>
           <mat-select formControlName="estadoCivil">
-            <mat-option [value]="null">—</mat-option>
             @for (ec of estadosCivis; track ec) {
               <mat-option [value]="ec">{{ 'cidadao.estadoCivil.' + ec | translate }}</mat-option>
             }
           </mat-select>
+          @if (form.get('estadoCivil')?.hasError('required')) {
+            <mat-error>{{ 'validation.required' | translate }}</mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'cidadao.email' | translate }}</mat-label>
+          <mat-label>{{ 'cidadao.email' | translate }} *</mat-label>
           <input matInput formControlName="email" type="email">
+          @if (form.get('email')?.hasError('required')) {
+            <mat-error>{{ 'validation.required' | translate }}</mat-error>
+          }
           @if (form.get('email')?.hasError('email')) {
             <mat-error>{{ 'validation.email' | translate }}</mat-error>
           }
@@ -108,8 +121,11 @@ interface DialogData {
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ 'cidadao.enderecoAlemanha' | translate }}</mat-label>
+          <mat-label>{{ 'cidadao.enderecoAlemanha' | translate }} *</mat-label>
           <textarea matInput formControlName="enderecoAlemanha" rows="2"></textarea>
+          @if (form.get('enderecoAlemanha')?.hasError('required')) {
+            <mat-error>{{ 'validation.required' | translate }}</mat-error>
+          }
         </mat-form-field>
       </form>
     </mat-dialog-content>
@@ -152,14 +168,14 @@ export class CidadaoFormDialog implements OnInit {
     this.form = this.fb.group({
       numeroPassaporte: [c?.numeroPassaporte ?? '', this.isEdit ? [] : [Validators.required, Validators.maxLength(50), Validators.pattern(/^[A-Za-z0-9\-]+$/)]],
       nomeCompleto: [c?.nomeCompleto ?? '', [Validators.required, Validators.maxLength(255)]],
-      dataNascimento: [c?.dataNascimento ? new Date(c.dataNascimento) : null],
-      sexo: [c?.sexo ?? null],
-      nacionalidade: [c?.nacionalidade ?? 'Angolana', [Validators.maxLength(100)]],
-      estadoCivil: [c?.estadoCivil ?? null],
-      email: [c?.email ?? '', [Validators.email]],
+      dataNascimento: [c?.dataNascimento ? new Date(c.dataNascimento) : null, [Validators.required]],
+      sexo: [c?.sexo ?? null, [Validators.required]],
+      nacionalidade: [c?.nacionalidade ?? 'Angolana', [Validators.required, Validators.maxLength(100)]],
+      estadoCivil: [c?.estadoCivil ?? null, [Validators.required]],
+      email: [c?.email ?? '', [Validators.required, Validators.email]],
       telefone: [c?.telefone ?? '', [Validators.maxLength(50), Validators.pattern(/^[+]?[0-9\s\-()]*$/)]],
       enderecoAngola: [c?.enderecoAngola ?? '', [Validators.maxLength(500)]],
-      enderecoAlemanha: [c?.enderecoAlemanha ?? '', [Validators.maxLength(500)]],
+      enderecoAlemanha: [c?.enderecoAlemanha ?? '', [Validators.required, Validators.maxLength(500)]],
     });
   }
 
